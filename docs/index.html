@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FairDataHive — Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="/docs/assets/favicon.svg" />
+  <link rel="icon" href="/docs/assets/favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/docs/assets/favicon-32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <script src="/docs/assets/theme-init.js"></script>
+  <style>
+    /* ───────────────────────────────────────────────────────── *
+     * FairDataHive · editorial dark theme                       *
+     * Palette: warm archive / honey / sage — not generic dark   *
+     * Type:    Fraunces (display) + IBM Plex Sans / Mono        *
+     * ───────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --nav-w:     272px;
+      --font:      'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      --serif:     'Fraunces', 'Iowan Old Style', 'Apple Garamond', 'Source Serif Pro', Georgia, serif;
+      --mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg:        #16130e;
+      --surface:   #1d1812;
+      --surface2:  #261f17;
+      --border:    #3a3127;
+      --border-strong: #4a3f31;
+      --text:      #f1e9da;
+      --text-soft: #d8cdb8;
+      --muted:     #a3927a;
+      --muted-2:   #7e6e58;
+      --accent:    #d4a574;
+      --accent-soft: #e8c79a;
+      --accent-bg: rgba(212, 165, 116, 0.10);
+      --accent-line: rgba(212, 165, 116, 0.28);
+      --sage:      #8aa890;
+      --clay:      #c47b5a;
+      --ember:     #c8665e;
+      --ink:       #8fa3b8;
+      --sidebar-bg: linear-gradient(180deg, #1d1812 0%, #19150f 100%);
+      --pre-bg: linear-gradient(180deg, #1a1610 0%, #16120c 100%);
+      --code-bg: rgba(212, 165, 116, 0.06);
+      --callout-bg: rgba(212, 165, 116, 0.04);
+      --table-hover: rgba(212, 165, 116, 0.025);
+      --table-surface: rgba(255, 246, 230, 0.01);
+      --nav-hover: rgba(212, 165, 116, 0.04);
+      --nav-active: rgba(212, 165, 116, 0.08);
+      --noise-opacity: 0.025;
+      --brand-glow: rgba(212, 165, 116, 0.20);
+      --shadow-1:  0 1px 0 rgba(255, 246, 230, 0.02) inset, 0 1px 2px rgba(0, 0, 0, 0.3);
+      --method-get-bg: rgba(138, 168, 144, 0.10);
+      --method-get-border: rgba(138, 168, 144, 0.25);
+      --method-post-bg: rgba(143, 163, 184, 0.10);
+      --method-post-border: rgba(143, 163, 184, 0.25);
+      --method-patch-bg: rgba(196, 123, 90, 0.10);
+      --method-patch-border: rgba(196, 123, 90, 0.25);
+      --method-delete-bg: rgba(200, 102, 94, 0.10);
+      --method-delete-border: rgba(200, 102, 94, 0.25);
+      --callout-info-bg: rgba(143, 163, 184, 0.05);
+      --callout-success-bg: rgba(138, 168, 144, 0.05);
+      --callout-warning-bg: rgba(196, 123, 90, 0.05);
+      --callout-danger-bg: rgba(200, 102, 94, 0.05);
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg:        #f6f1e8;
+      --surface:   #fffdf8;
+      --surface2:  #f0ebe2;
+      --border:    #d4c9b8;
+      --border-strong: #bfb39f;
+      --text:      #1a1610;
+      --text-soft: #3d352c;
+      --muted:     #6b5f4f;
+      --muted-2:   #8a7c6a;
+      --accent:    #9a7344;
+      --accent-soft: #7d5c32;
+      --accent-bg: rgba(154, 115, 68, 0.12);
+      --accent-line: rgba(154, 115, 68, 0.35);
+      --sage:      #4a7356;
+      --clay:      #a85a38;
+      --ember:     #b84a42;
+      --ink:       #4a6278;
+      --sidebar-bg: linear-gradient(180deg, #fffdf8 0%, #f6f1e8 100%);
+      --pre-bg: linear-gradient(180deg, #fffdf8 0%, #f0ebe2 100%);
+      --code-bg: rgba(154, 115, 68, 0.08);
+      --callout-bg: rgba(154, 115, 68, 0.06);
+      --table-hover: rgba(154, 115, 68, 0.04);
+      --table-surface: rgba(255, 253, 248, 0.8);
+      --nav-hover: rgba(154, 115, 68, 0.06);
+      --nav-active: rgba(154, 115, 68, 0.12);
+      --noise-opacity: 0.035;
+      --brand-glow: rgba(154, 115, 68, 0.15);
+      --shadow-1:  0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 1px 2px rgba(26, 22, 16, 0.08);
+      --method-get-bg: rgba(74, 115, 86, 0.12);
+      --method-get-border: rgba(74, 115, 86, 0.28);
+      --method-post-bg: rgba(74, 98, 120, 0.12);
+      --method-post-border: rgba(74, 98, 120, 0.28);
+      --method-patch-bg: rgba(168, 90, 56, 0.12);
+      --method-patch-border: rgba(168, 90, 56, 0.28);
+      --method-delete-bg: rgba(184, 74, 66, 0.12);
+      --method-delete-border: rgba(184, 74, 66, 0.28);
+      --callout-info-bg: rgba(74, 98, 120, 0.08);
+      --callout-success-bg: rgba(74, 115, 86, 0.08);
+      --callout-warning-bg: rgba(168, 90, 56, 0.08);
+      --callout-danger-bg: rgba(184, 74, 66, 0.08);
+    }
+
+    html { font-feature-settings: "ss01", "cv11"; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-soft);
+      line-height: 1.65;
+      font-size: 15.5px;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Subtle paper-grain noise — barely perceptible, adds depth */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: var(--noise-opacity);
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+    }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: var(--nav-w) 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ────────────────────────────────────────────── */
+    nav.sidebar {
+      width: var(--nav-w);
+      min-width: var(--nav-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 1.75rem 0 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0 1.5rem 1.75rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+      text-decoration: none;
+    }
+
+    .sidebar-logo .mark {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      filter: drop-shadow(0 1px 4px var(--brand-glow));
+    }
+
+    .sidebar-logo .mark img,
+    .sidebar-logo .mark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .sidebar-logo .name {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      font-variation-settings: "opsz" 24;
+    }
+
+    .sidebar-logo .version {
+      display: inline-block;
+      margin-top: 0.15rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 0.05rem 0.35rem;
+      border-radius: 3px;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-group {
+      padding: 0.5rem 0 0.65rem;
+    }
+
+    .nav-group-label {
+      padding: 0.4rem 1.5rem 0.5rem;
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted-2);
+      font-weight: 600;
+    }
+
+    .nav-group a {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.38rem 1.5rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 400;
+      border-left: 2px solid transparent;
+      transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .nav-group a:hover {
+      color: var(--text);
+      background: var(--nav-hover);
+    }
+
+    .nav-group a.active {
+      color: var(--accent-soft);
+      border-left-color: var(--accent);
+      background: var(--accent-bg);
+      font-weight: 500;
+    }
+
+    .nav-group a .icon {
+      font-size: 0.8rem;
+      width: 14px;
+      text-align: center;
+      color: var(--muted-2);
+      transition: color 0.18s ease;
+    }
+    .nav-group a:hover .icon,
+    .nav-group a.active .icon { color: var(--accent); }
+
+    .sidebar-theme {
+      padding: 0 1.5rem 1.25rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      width: 100%;
+      justify-content: center;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--surface);
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+      border-color: var(--border-strong);
+      background: var(--surface2);
+    }
+
+    .theme-toggle[aria-pressed="true"] {
+      color: var(--accent-soft);
+      border-color: var(--accent-line);
+      background: var(--accent-bg);
+    }
+
+    .theme-toggle-icon {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    /* ── Main content — centered in the area beside the sidebar ─ */
+    main {
+      justify-self: center;
+      width: 100%;
+      max-width: 920px;
+      min-width: 0;
+      padding: 3.25rem 3.5rem 5rem;
+      box-sizing: border-box;
+    }
+
+    /* ── Headings — Fraunces editorial display ──────────────── */
+    h1, h2, h3 {
+      font-family: var(--serif);
+      color: var(--text);
+      font-feature-settings: "ss01", "salt";
+    }
+    h1 {
+      font-size: 2.85rem;
+      font-weight: 600;
+      letter-spacing: -0.022em;
+      line-height: 1.05;
+      margin-bottom: 0.6rem;
+      font-variation-settings: "opsz" 96, "SOFT" 30;
+    }
+    h2 {
+      font-size: 1.7rem;
+      font-weight: 600;
+      letter-spacing: -0.012em;
+      margin: 3rem 0 0.85rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border);
+      font-variation-settings: "opsz" 48, "SOFT" 20;
+    }
+    h3 {
+      font-size: 1.18rem;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      margin: 2rem 0 0.6rem;
+      font-variation-settings: "opsz" 24;
+    }
+    h4 {
+      font-family: var(--font);
+      font-size: 0.74rem;
+      font-weight: 600;
+      margin: 1.4rem 0 0.4rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    section > h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+    .page-header {
+      padding: 0.5rem 0 2rem;
+      margin-bottom: 2.25rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .page-header::before {
+      content: "";
+      position: absolute;
+      top: 0.5rem;
+      left: 0;
+      width: 2.5rem;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+    .page-header h1 { margin-top: 0.8rem; }
+    .page-header p {
+      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.55;
+      margin-top: 0.6rem;
+      max-width: 56ch;
+    }
+
+    .page-header .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1.25rem;
+    }
+
+    /* Restrained badges — outline only, single tone */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.18rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      font-family: var(--mono);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .badge:hover { color: var(--text); border-color: var(--border-strong); }
+    .badge::before {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--muted-2);
+      flex-shrink: 0;
+    }
+    .badge-blue::before   { background: var(--ink); }
+    .badge-green::before  { background: var(--sage); }
+    .badge-purple::before { background: var(--accent); }
+    .badge-orange::before { background: var(--clay); }
+
+    /* ── Prose ──────────────────────────────────────────────── */
+    p { margin: 0.6rem 0 1rem; color: var(--text-soft); }
+    p strong { color: var(--text); font-weight: 600; }
+    p em {
+      color: var(--accent-soft);
+      font-style: italic;
+      font-family: var(--serif);
+      font-variation-settings: "opsz" 14;
+    }
+    a {
+      color: var(--accent-soft);
+      text-decoration: underline;
+      text-decoration-color: var(--accent-line);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      transition: text-decoration-color 0.15s, color 0.15s;
+    }
+    a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+
+    ul, ol { margin: 0.5rem 0 1rem 1.4rem; color: var(--text-soft); }
+    li { margin-bottom: 0.45rem; }
+    li::marker { color: var(--muted-2); }
+    li strong { color: var(--text); font-weight: 600; }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 3rem 0;
+    }
+
+    /* ── Code ───────────────────────────────────────────────── */
+    code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 0.08em 0.4em;
+      border-radius: 3px;
+      color: var(--accent-soft);
+    }
+
+    pre {
+      background: var(--pre-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem 1.4rem 1.1rem;
+      overflow-x: auto;
+      margin: 0.75rem 0 1.5rem;
+      position: relative;
+      box-shadow: var(--shadow-1);
+    }
+
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: var(--text-soft);
+    }
+
+    .pre-label {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.85rem;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted-2);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    /* ── Callouts — single editorial style with accent stripe ── */
+    .callout {
+      display: flex;
+      gap: 0.85rem;
+      padding: 1rem 1.15rem;
+      border-radius: 4px;
+      margin: 1.25rem 0 1.5rem;
+      background: var(--callout-bg);
+      border-left: 2px solid var(--accent);
+    }
+    .callout-icon {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--accent);
+      flex-shrink: 0;
+      line-height: 1.3;
+      font-variation-settings: "opsz" 14;
+    }
+    .callout-body p { margin: 0; color: var(--text-soft); }
+    .callout-body p + p { margin-top: 0.35rem; }
+    .callout-body strong { color: var(--text); }
+    .callout.info    { border-left-color: var(--ink);   background: var(--callout-info-bg); }
+    .callout.info    .callout-icon { color: var(--ink); }
+    .callout.success { border-left-color: var(--sage);  background: var(--callout-success-bg); }
+    .callout.success .callout-icon { color: var(--sage); }
+    .callout.warning { border-left-color: var(--clay);  background: var(--callout-warning-bg); }
+    .callout.warning .callout-icon { color: var(--clay); }
+    .callout.danger  { border-left-color: var(--ember); background: var(--callout-danger-bg); }
+    .callout.danger  .callout-icon { color: var(--ember); }
+
+    /* ── Tables — editorial, gridless ───────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 0.75rem 0 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--table-surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.7rem 1rem;
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-soft);
+      vertical-align: top;
+    }
+
+    td strong { color: var(--text); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--table-hover); }
+
+    /* ── Cards / grids — quiet, with a subtle top hairline ─── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.85rem;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.1rem 1.15rem 1rem;
+      position: relative;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: -1px; left: 1rem;
+      width: 1.5rem; height: 1px;
+      background: var(--accent);
+      opacity: 0.6;
+      transition: width 0.25s ease, opacity 0.25s ease;
+    }
+    .card:hover { border-color: var(--border-strong); }
+    .card:hover::before { width: 3rem; opacity: 1; }
+
+    .card-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      color: var(--accent);
+      margin-bottom: 0.65rem;
+    }
+    .card-icon svg { width: 100%; height: 100%; display: block; }
+
+    .card h4 {
+      margin: 0 0 0.4rem;
+      text-transform: none;
+      letter-spacing: -0.005em;
+      color: var(--text);
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 1.02rem;
+      font-variation-settings: "opsz" 18;
+    }
+    .card p { margin: 0; font-size: 0.86rem; color: var(--muted); line-height: 1.55; }
+
+    /* ── Endpoint list ──────────────────────────────────────── */
+    .endpoint {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.55rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+    .endpoint:first-child { border-top: 1px solid var(--border); }
+
+    .method {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 0.15rem 0.55rem;
+      border-radius: 3px;
+      min-width: 56px;
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+    .get    { background: var(--method-get-bg); color: var(--sage); border: 1px solid var(--method-get-border); }
+    .post   { background: var(--method-post-bg); color: var(--ink);  border: 1px solid var(--method-post-border); }
+    .patch  { background: var(--method-patch-bg);  color: var(--clay); border: 1px solid var(--method-patch-border); }
+    .delete { background: var(--method-delete-bg);  color: var(--ember); border: 1px solid var(--method-delete-border); }
+
+    .endpoint-path {
+      font-family: var(--mono);
+      font-size: 0.84rem;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .endpoint-desc {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .auth-required {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      background: var(--accent-bg);
+      color: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── FAIR dimension display — editorial pull-quote feel ── */
+    .fair-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .fair-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.25rem 1.25rem 1.1rem;
+      position: relative;
+    }
+
+    .fair-card .letter {
+      font-family: var(--serif);
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      font-variation-settings: "opsz" 144;
+      font-style: italic;
+    }
+
+    .fair-card h4 {
+      margin: 0.35rem 0 0.55rem;
+      text-transform: none;
+      letter-spacing: -0.005em;
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      font-variation-settings: "opsz" 18;
+    }
+
+    .fair-card ul {
+      margin: 0;
+      padding-left: 1rem;
+      font-size: 0.83rem;
+      color: var(--muted);
+    }
+
+    /* ── Steps — outlined numerals, editorial ───────────────── */
+    .steps { counter-reset: step; list-style: none; margin: 0.85rem 0 1.5rem; padding: 0; }
+    .steps > li {
+      counter-increment: step;
+      position: relative;
+      padding-left: calc(32px + 1rem);
+      margin-bottom: 1.25rem;
+      color: var(--text-soft);
+      line-height: 1.55;
+      font-size: 0.94rem;
+    }
+    .steps > li::before {
+      content: counter(step, decimal-leading-zero);
+      position: absolute;
+      left: 0;
+      top: 0.1rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--accent-line);
+      color: var(--accent);
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 0.8rem;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-variation-settings: "opsz" 14;
+    }
+    .steps > li code {
+      display: inline;
+      vertical-align: baseline;
+      line-height: inherit;
+      white-space: nowrap;
+    }
+    .steps > li > div {
+      min-width: 0;
+    }
+    .steps > li > div > p:first-child {
+      margin-top: 0;
+    }
+    .steps > li > div > p {
+      margin: 0.65rem 0 0.75rem;
+      font-size: 0.94rem;
+    }
+    .steps > li > div > ul {
+      margin: 0.55rem 0 0.85rem;
+      padding-left: 1.25rem;
+      list-style: disc;
+    }
+    .steps > li > div > ul > li {
+      display: list-item;
+      margin-bottom: 0.4rem;
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+    .steps > li > div > ul > li::before {
+      content: none;
+      display: none;
+    }
+    .steps > li > div > ul > li em {
+      color: var(--accent-soft);
+      font-family: var(--serif);
+      font-style: italic;
+      font-variation-settings: "opsz" 14;
+    }
+    .steps > li > div > ul > li code {
+      display: inline;
+      vertical-align: baseline;
+      line-height: inherit;
+      white-space: nowrap;
+    }
+    .steps > li > div .callout {
+      margin: 0.75rem 0 0;
+    }
+
+    /* ── TOC ────────────────────────────────────────────────── */
+    .toc-inline {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.1rem 1.35rem;
+      margin: 0 0 1.5rem;
+      font-size: 0.88rem;
+    }
+
+    .toc-inline h4 {
+      margin: 0 0 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-family: var(--font);
+    }
+
+    .toc-inline ol {
+      margin: 0;
+      padding-left: 1.4rem;
+    }
+
+    .toc-inline li { margin-bottom: 0.3rem; }
+    .toc-inline li::marker { color: var(--muted-2); font-family: var(--mono); }
+
+    /* ── Selection ──────────────────────────────────────────── */
+    ::selection { background: var(--accent-bg); color: var(--text); }
+
+    /* ── Scrollbar ──────────────────────────────────────────── */
+    * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      nav.sidebar { display: none; }
+      main {
+        justify-self: center;
+        padding: 2rem 1.5rem;
+      }
+      .fair-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.45rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+  <nav class="sidebar">
+    <a class="sidebar-logo" href="#">
+      <span class="mark" aria-hidden="true">
+        <img src="/docs/assets/logo.svg" width="40" height="40" alt="FairDataHive" />
+      </span>
+      <span>
+        <span class="name">FairDataHive</span><br>
+        <span class="version">v1.0.0</span>
+      </span>
+    </a>
+
+    <div class="sidebar-theme">
+      <button type="button" class="theme-toggle" aria-pressed="false" title="Switch to light mode">
+        <span class="theme-toggle-icon" aria-hidden="true">☽</span>
+        <span class="theme-toggle-label">Light</span>
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="#overview"><span class="icon">◈</span> Overview</a>
+      <a href="#architecture"><span class="icon">⬡</span> Architecture</a>
+      <a href="#quickstart"><span class="icon">⚡</span> Quick Start</a>
+      <a href="#configuration"><span class="icon">⚙</span> Configuration</a>
+      <a href="#deployment"><span class="icon">▣</span> Deployment</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">UI</div>
+      <a href="#react-ui"><span class="icon">◻</span> React UI</a>
+      <a href="#ui-guide"><span class="icon">◎</span> Usage Guide</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">API Reference</div>
+      <a href="#api-catalog"><span class="icon">◷</span> Catalog</a>
+      <a href="#api-resources"><span class="icon">◈</span> Resources</a>
+      <a href="#api-files"><span class="icon">◫</span> Files</a>
+      <a href="#api-search"><span class="icon">⌕</span> Search</a>
+      <a href="#api-access"><span class="icon">◐</span> Access</a>
+      <a href="#api-interop"><span class="icon">◉</span> Interop</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Concepts</div>
+      <a href="#data-model"><span class="icon">◧</span> Data Model</a>
+      <a href="#fair"><span class="icon">★</span> FAIR Scoring</a>
+      <a href="#auth"><span class="icon">◑</span> Authentication</a>
+      <a href="#search-detail"><span class="icon">⌕</span> Search Engine</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Development</div>
+      <a href="#local-dev"><span class="icon">◎</span> Local Dev</a>
+      <a href="#testing"><span class="icon">◷</span> Testing</a>
+      <a href="#troubleshooting"><span class="icon">◌</span> Troubleshooting</a>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- ── PAGE HEADER ───────────────────────────────────────── -->
+    <div class="page-header">
+      <h1>FairDataHive</h1>
+      <p>A FAIR-compliant research data catalog built on W3C DCAT&nbsp;3, FastAPI, and PostgreSQL.</p>
+      <div class="badges">
+        <span class="badge badge-blue">FastAPI 0.111</span>
+        <span class="badge badge-blue">Python 3.12</span>
+        <span class="badge badge-green">PostgreSQL 16 + pgvector</span>
+        <span class="badge badge-green">DCAT-AP 3</span>
+        <span class="badge badge-purple">FAIR</span>
+        <span class="badge badge-purple">OAI-PMH</span>
+        <span class="badge badge-orange">React 18 + Vite</span>
+      </div>
+    </div>
+
+    <!-- ── OVERVIEW ──────────────────────────────────────────── -->
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>
+        FairDataHive is a self-hosted research data management system that lets teams register,
+        describe, version, publish, and share datasets following open standards. It replaces
+        ad-hoc file shares and spreadsheet catalogs with a structured, searchable, and
+        interoperable repository.
+      </p>
+
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 7l9-4 9 4-9 4-9-4z"/>
+              <path d="M3 12l9 4 9-4"/>
+              <path d="M3 17l9 4 9-4"/>
+            </svg>
+          </span>
+          <h4>Catalog Management</h4>
+          <p>Create and publish versioned dataset records with rich DCAT metadata.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="10.5" cy="10.5" r="6.5"/>
+              <path d="M21 21l-5.5-5.5"/>
+              <path d="M7.5 10.5h6" opacity="0.55"/>
+            </svg>
+          </span>
+          <h4>Dual-mode Search</h4>
+          <p>Full-text keyword search and semantic vector search over published resources.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9L12 17l-5.3 2.8 1-5.9-4.3-4.2 5.9-.8L12 3.5z"/>
+            </svg>
+          </span>
+          <h4>FAIR Scoring</h4>
+          <p>Automatic per-resource FAIR assessment with actionable improvement suggestions.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="6" r="2.4"/>
+              <circle cx="18" cy="6" r="2.4"/>
+              <circle cx="6" cy="18" r="2.4"/>
+              <circle cx="18" cy="18" r="2.4"/>
+              <circle cx="12" cy="12" r="2.4"/>
+              <path d="M7.7 7.5l2.7 3M16.3 7.5l-2.7 3M7.7 16.5l2.7-3M16.3 16.5l-2.7-3" opacity="0.6"/>
+            </svg>
+          </span>
+          <h4>RDF Export</h4>
+          <p>Machine-readable Turtle and JSON-LD exports per resource and catalog-wide.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8.5"/>
+              <path d="M3.5 12h17M12 3.5c2.6 3 2.6 14 0 17M12 3.5c-2.6 3-2.6 14 0 17"/>
+            </svg>
+          </span>
+          <h4>OAI-PMH</h4>
+          <p>Standards-based harvesting endpoint for external portal integration.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="11" width="14" height="9" rx="1.5"/>
+              <path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>
+              <circle cx="12" cy="15.5" r="1.2"/>
+            </svg>
+          </span>
+          <h4>Access Control</h4>
+          <p>Private resources with owner-managed access request workflows.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ARCHITECTURE ──────────────────────────────────────── -->
+    <section id="architecture">
+      <h2>Architecture</h2>
+      <p>
+        FairDataHive follows a layered service architecture. The backend stack runs in Docker
+        Compose; the React UI runs locally with Vite during development, or as static files
+        served by the API after <code>npm run build</code>. There is no containerized Vite
+        service — that pattern duplicated port <code>5173</code> and caused a second dev
+        server on <code>5174</code>.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Layer</th><th>Technology</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>API</strong></td><td>FastAPI 0.111, Python 3.12</td><td>REST API, business logic, async I/O</td></tr>
+            <tr><td><strong>ORM / Migrations</strong></td><td>SQLAlchemy 2.0 async, Alembic</td><td>Schema management, typed queries</td></tr>
+            <tr><td><strong>Primary database</strong></td><td>PostgreSQL 16 + pgvector</td><td>Relational storage, FTS indexes, vector search</td></tr>
+            <tr><td><strong>Object storage</strong></td><td>MinIO (S3-compatible)</td><td>File uploads, presigned download URLs</td></tr>
+            <tr><td><strong>Cache</strong></td><td>Redis 7</td><td>Search result caching, TTL invalidation</td></tr>
+            <tr><td><strong>Embeddings</strong></td><td>sentence-transformers (in-process)</td><td>768-dim vectors for semantic search</td></tr>
+            <tr><td><strong>RDF</strong></td><td>rdflib 7</td><td>Turtle / JSON-LD / OAI-DC generation</td></tr>
+            <tr><td><strong>SHACL</strong></td><td>pyshacl 0.25</td><td>DCAT-AP shape validation</td></tr>
+            <tr><td><strong>UI</strong></td><td>React 18, Vite, TypeScript</td><td>Browser data management interface</td></tr>
+            <tr><td><strong>Auth</strong></td><td>Keycloak 24 (optional)</td><td>OIDC/JWT identity provider</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Host port mapping (Docker Compose)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Service</th><th>Container port</th><th>Host port</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>API</strong></td><td>8000</td><td><strong>8002</strong></td><td>Docs at <code>/docs</code>; Swagger at <code>/swagger</code>; UI at <code>/ui</code></td></tr>
+            <tr><td><strong>PostgreSQL</strong></td><td>5432</td><td><strong>5434</strong></td><td>Avoids conflict with local Postgres on 5432</td></tr>
+            <tr><td><strong>MinIO S3</strong></td><td>9000</td><td><strong>9002</strong></td><td>Set <code>MINIO_PUBLIC_ENDPOINT=http://localhost:9002</code></td></tr>
+            <tr><td><strong>MinIO console</strong></td><td>9001</td><td><strong>9003</strong></td><td>Default login <code>minioadmin / minioadmin</code></td></tr>
+            <tr><td><strong>Redis</strong></td><td>6379</td><td><em>none</em></td><td>Internal compose network only</td></tr>
+            <tr><td><strong>Keycloak</strong></td><td>8080</td><td>8080</td><td>Optional: <code>docker compose --profile auth up -d auth</code></td></tr>
+            <tr><td><strong>React UI (dev)</strong></td><td>—</td><td><strong>5173</strong></td><td>Local only: <code>cd frontend && npm run dev</code> (<code>strictPort</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Service topology</h3>
+      <pre><code>Browser
+  │
+  ├── :5173   Vite dev server (host: npm run dev) ──────────┐
+  │              /docs → docs/index.html (local)           │
+  │              proxies /api, /swagger → :8002            │
+  ├── :8002/ui   production build (frontend/dist)          ├──► API (Docker :8002)
+  └── :8002/docs guide · :8002/swagger OpenAPI             │
+                │                                           │
+                ├── postgres   (host :5434)
+                ├── minio      (host :9002 / :9003)
+                ├── redis      (internal)
+                └── auth       (optional profile, :8080)
+
+docker compose up -d  →  backend only (no Node/Vite container)</code></pre>
+
+      <h3>Repository layout</h3>
+      <pre><code>fairdatahive/
+├── app/
+│   ├── config.py          ← Pydantic Settings (all env vars)
+│   ├── database.py        ← Async SQLAlchemy engine
+│   ├── main.py            ← FastAPI factory, middleware, router mount
+│   ├── core/              ← Auth, exceptions, pagination, constants
+│   ├── models/            ← SQLAlchemy ORM models (source of truth)
+│   ├── schemas/           ← Pydantic v2 request / response contracts
+│   ├── routers/           ← HTTP routing (thin layer, no logic)
+│   └── services/          ← Business logic (resource, search, fair…)
+├── alembic/               ← Database migrations
+├── frontend/              ← React + TypeScript UI (Vite, scripts/dev-server.mjs)
+├── docs/                  ← This documentation (index.html)
+├── static/                ← context.jsonld, dcat_ap_shapes.ttl
+├── templates/             ← Jinja2 HTML landing page
+├── tests/                 ← pytest-asyncio test suite
+├── docker/                ← entrypoint.sh
+├── docker-compose.yml
+├── Dockerfile
+└── .env.example</code></pre>
+    </section>
+
+    <!-- ── QUICK START ────────────────────────────────────────── -->
+    <section id="quickstart">
+      <h2>Quick Start</h2>
+
+      <h3>Prerequisites</h3>
+      <ul>
+        <li>Docker ≥ 24 and Docker Compose v2</li>
+        <li>Ports <code>5173</code>, <code>8002</code>, <code>9002</code>, <code>9003</code>, <code>5434</code> available on the host (Redis is internal-only)</li>
+      </ul>
+
+      <h3>Start the full stack</h3>
+      <ol class="steps">
+        <li>
+          <div>
+            <strong>Clone the repository and enter the project directory.</strong>
+            <pre><span class="pre-label">bash</span><code>git clone &lt;repo-url&gt;
+cd fairdatahive</code></pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Create your environment file.</strong>
+            <pre><span class="pre-label">bash</span><code>cp .env.example .env</code></pre>
+            <p>The defaults work out of the box for local development. See <a href="#configuration">Configuration</a> for a full reference.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Build and start all services.</strong>
+            <pre><span class="pre-label">bash</span><code>docker compose build
+docker compose up -d</code></pre>
+            <p>
+              Starts <strong>postgres</strong>, <strong>minio</strong>, <strong>redis</strong>, and
+              <strong>api</strong> only — not a Vite/Node UI container. The API runs Alembic
+              migrations on startup; wait ~15 seconds on first boot.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Verify the API is healthy.</strong>
+            <pre><span class="pre-label">bash</span><code>curl http://localhost:8002/api/v1/health
+# {"status":"ok","components":{"database":"ok","cache":"ok"}}</code></pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Start the React UI (separate terminal).</strong>
+            <pre><span class="pre-label">bash</span><code>cd frontend
+cp .env.example .env
+npm install
+npm run dev</code></pre>
+            <p>
+              Open <a href="http://localhost:5173" target="_blank">http://localhost:5173</a>.
+              Vite proxies <code>/api</code>, <code>/swagger</code>, and <code>/openapi.json</code> to
+              <code>:8002</code>. Project documentation is served at <code>/docs</code> from the
+              <code>docs/</code> folder. Only one dev server should run on port <strong>5173</strong>;
+              <code>npm run dev</code> clears any orphan on <strong>5174</strong> automatically.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Optional — production-like UI without Vite.</strong>
+            <pre><span class="pre-label">bash</span><code>cd frontend && npm run build
+docker compose build api && docker compose up -d --force-recreate api</code></pre>
+            <p>Open <a href="http://localhost:8002/ui/" target="_blank">http://localhost:8002/ui/</a> (root <code>/</code> redirects there).</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3>Key URLs after startup</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Service</th><th>URL</th></tr></thead>
+          <tbody>
+            <tr><td><strong>React UI (dev)</strong></td><td><a href="http://localhost:5173" target="_blank">http://localhost:5173</a> — <code>npm run dev</code> in <code>frontend/</code></td></tr>
+            <tr><td><strong>React UI (built)</strong></td><td><a href="http://localhost:8002/ui/" target="_blank">http://localhost:8002/ui/</a> — after <code>npm run build</code></td></tr>
+            <tr><td><strong>Documentation</strong></td><td><a href="http://localhost:5173/docs" target="_blank">http://localhost:5173/docs</a> (or <a href="http://localhost:8002/docs" target="_blank">:8002/docs</a> via API)</td></tr>
+            <tr><td><strong>Swagger / OpenAPI</strong></td><td><a href="http://localhost:8002/swagger" target="_blank">http://localhost:8002/swagger</a> (proxied from Vite as <code>/swagger</code>)</td></tr>
+            <tr><td><strong>MinIO console</strong></td><td><a href="http://localhost:9003" target="_blank">http://localhost:9003</a> — <code>minioadmin / minioadmin</code></td></tr>
+            <tr><td><strong>Catalog (Turtle)</strong></td><td><a href="http://localhost:8002/api/v1/catalog.ttl" target="_blank">http://localhost:8002/api/v1/catalog.ttl</a></td></tr>
+            <tr><td><strong>OAI-PMH endpoint</strong></td><td><a href="http://localhost:8002/api/v1/oai?verb=Identify" target="_blank">http://localhost:8002/api/v1/oai?verb=Identify</a></td></tr>
+            <tr><td><strong>Prometheus metrics</strong></td><td><a href="http://localhost:8002/metrics" target="_blank">http://localhost:8002/metrics</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ</span>
+        <div class="callout-body">
+          <p><strong>Dev auth mode</strong> — the default <code>.env</code> sets <code>DEV_AUTH_ENABLED=true</code>, which bypasses JWT verification and treats every request as a fixed <code>dev-user</code>. This makes local development frictionless. Disable it for any shared or production deployment.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠</span>
+        <div class="callout-body">
+          <p><strong>One UI dev server</strong> — use only <code>http://localhost:5173</code>. If you previously saw the same app on <code>5174</code>, a second Vite had started when <code>5173</code> was busy. Run <code>npm run dev:stop</code> in <code>frontend/</code>, then <code>npm run dev</code>. Do not run a Docker Vite container alongside local <code>npm run dev</code> (that service was removed from Compose).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONFIGURATION ─────────────────────────────────────── -->
+    <section id="configuration">
+      <h2>Configuration</h2>
+      <p>
+        All configuration is driven by environment variables (loaded from <code>.env</code> by
+        Pydantic Settings). No code changes are needed to adapt FairDataHive to your environment.
+      </p>
+
+      <h3>Database</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>DATABASE_URL</code></td><td><code>postgresql+asyncpg://fairdatahive:fairdatahive@postgres:5432/fairdatahive</code></td><td>Async PostgreSQL connection string</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Object storage (MinIO / S3)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>MINIO_ENDPOINT</code></td><td><code>http://minio:9000</code></td><td>S3 endpoint used by the API container (Docker hostname)</td></tr>
+            <tr><td><code>MINIO_PUBLIC_ENDPOINT</code></td><td><code>http://localhost:9002</code></td><td>Browser-facing URL embedded in presigned download links (host port from compose).</td></tr>
+            <tr><td><code>MINIO_ACCESS_KEY</code></td><td><code>minioadmin</code></td><td>S3 access key</td></tr>
+            <tr><td><code>MINIO_SECRET_KEY</code></td><td><code>minioadmin</code></td><td>S3 secret key</td></tr>
+            <tr><td><code>MINIO_BUCKET</code></td><td><code>fairdatahive-catalog</code></td><td>Bucket name for file uploads</td></tr>
+            <tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td><code>500</code></td><td>Maximum per-file upload size in megabytes</td></tr>
+            <tr><td><code>PRESIGNED_URL_EXPIRY_SECONDS</code></td><td><code>3600</code></td><td>Presigned download URL lifetime</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Authentication</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>KEYCLOAK_URL</code></td><td><code>http://auth:8080</code></td><td>Keycloak base URL for JWKS fetching</td></tr>
+            <tr><td><code>KEYCLOAK_REALM</code></td><td><code>fairdatahive</code></td><td>Realm name</td></tr>
+            <tr><td><code>DEV_AUTH_ENABLED</code></td><td><code>true</code> in <code>.env.example</code></td><td>Skip JWT and use a fixed dev identity (<code>dev-user</code>). Set <code>false</code> for production.</td></tr>
+            <tr><td><code>DEV_AUTH_SUB</code></td><td><code>dev-user</code></td><td>Subject claim used when dev auth is active</td></tr>
+            <tr><td><code>DEV_AUTH_NAME</code></td><td><code>Development User</code></td><td>Display name for the dev user</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Search and catalog</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>REDIS_URL</code></td><td><code>redis://redis:6379/0</code></td><td>Redis connection URL for search result caching</td></tr>
+            <tr><td><code>EMBEDDING_MODEL</code></td><td><code>multi-qa-mpnet-base-dot-v1</code></td><td>sentence-transformers model for semantic search</td></tr>
+            <tr><td><code>SEMANTIC_SEARCH_THRESHOLD</code></td><td><code>0.30</code></td><td>Minimum cosine similarity for a semantic hit</td></tr>
+            <tr><td><code>FAIR_SCORE_PUBLISH_THRESHOLD</code></td><td><code>0.40</code></td><td>Minimum overall FAIR score required to publish</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>CORS</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>CORS_ORIGINS</code></td><td><code>http://localhost:5173,http://localhost:3000,http://localhost:8002</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Optional integrations</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASSWORD</code></td><td>Email delivery for access notifications</td></tr>
+            <tr><td><code>DATACITE_REPO_ID / DATACITE_PASSWORD / DATACITE_DOI_PREFIX</code></td><td>DataCite Fabrica API credentials for DOI minting</td></tr>
+            <tr><td><code>DATACITE_API_URL</code></td><td>Defaults to <code>https://api.test.datacite.org</code> (sandbox)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ── DEPLOYMENT ─────────────────────────────────────────── -->
+    <section id="deployment">
+      <h2>Deployment</h2>
+      <p>
+        FairDataHive is designed as a <strong>self-hosted data management service</strong>: metadata
+        and search live in PostgreSQL, binaries in S3-compatible object storage, and the API
+        orchestrates FAIR cataloguing, access control, and interoperability endpoints. This section
+        describes how to deploy that stack reliably for lab, consortium, or institutional use —
+        not only “start containers”, but the operational choices that keep catalogs findable,
+        downloadable, and auditable over time.
+      </p>
+
+      <div class="toc-inline">
+        <h4>On this page</h4>
+        <ol>
+          <li><a href="#deploy-topology">Topology and components</a></li>
+          <li><a href="#deploy-prerequisites">Prerequisites</a></li>
+          <li><a href="#deploy-models">Deployment models</a></li>
+          <li><a href="#deploy-compose">Docker Compose (single host)</a></li>
+          <li><a href="#deploy-ui">Serving the React UI</a></li>
+          <li><a href="#deploy-storage">Object storage</a></li>
+          <li><a href="#deploy-database">Database and migrations</a></li>
+          <li><a href="#deploy-auth">Authentication in production</a></li>
+          <li><a href="#deploy-proxy">Reverse proxy and TLS</a></li>
+          <li><a href="#deploy-env">Production environment</a></li>
+          <li><a href="#deploy-ops">Operations: backup, upgrade, monitoring</a></li>
+          <li><a href="#deploy-security">Security checklist</a></li>
+        </ol>
+      </div>
+
+      <h3 id="deploy-topology">Topology and components</h3>
+      <p>
+        Treat FairDataHive as a <em>small platform</em>, not a single process. Each component has a
+        distinct failure domain and scaling profile:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Component</th><th>Role</th><th>Persistence</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>API</strong> (FastAPI)</td><td>REST, RDF, OAI-PMH, presigned URLs, FAIR scoring</td><td>Stateless</td><td>CPU/RAM for embeddings on semantic search; rebuild image on release</td></tr>
+            <tr><td><strong>PostgreSQL 16 + pgvector</strong></td><td>Catalog metadata, FTS, vector index, audit</td><td>Durable volume</td><td>Back up regularly; extensions required at init</td></tr>
+            <tr><td><strong>MinIO / S3</strong></td><td>Uploaded files and ZIP extracts</td><td>Durable volume or external bucket</td><td>Must be reachable from API <em>and</em> browsers (see public endpoint)</td></tr>
+            <tr><td><strong>Redis</strong></td><td>Search result cache</td><td>Optional persistence</td><td>Safe to flush; cache rebuilds on traffic</td></tr>
+            <tr><td><strong>Keycloak</strong> (optional)</td><td>OIDC/JWT issuer</td><td>Its own DB in real deployments</td><td>Compose profile <code>auth</code> is dev-oriented only</td></tr>
+            <tr><td><strong>React UI</strong></td><td>Human catalog interface</td><td>Static files in <code>frontend/dist</code></td><td>Served by API at <code>/ui</code> or separate CDN</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The bundled <code>docker-compose.yml</code> maps host ports to avoid clashes on developer
+        machines (<strong>8002</strong> API, <strong>5434</strong> Postgres, <strong>9002/9003</strong>
+        MinIO). In production behind a reverse proxy you typically expose <strong>443</strong> only
+        and keep data services on an internal network.
+      </p>
+
+      <h3 id="deploy-prerequisites">Prerequisites</h3>
+      <ul>
+        <li><strong>Container runtime</strong> — Docker 24+ and Compose v2 (or an equivalent orchestrator).</li>
+        <li><strong>Host resources</strong> — minimum 4&nbsp;GB RAM for a pilot (8&nbsp;GB+ recommended once semantic search and concurrent uploads matter). Disk: Postgres + object storage grow with catalog size; plan object storage separately from DB.</li>
+        <li><strong>Network</strong> — stable DNS for the public catalog URL; outbound HTTPS if using DataCite or external IdP.</li>
+        <li><strong>Secrets store</strong> — production credentials must not live in git; use a vault, compose secrets, or orchestrator secrets.</li>
+        <li><strong>TLS termination</strong> — HTTPS at the edge (reverse proxy or load balancer) for UI, API, and presigned download URLs.</li>
+      </ul>
+
+      <h3 id="deploy-models">Deployment models</h3>
+      <div class="card-grid">
+        <div class="card">
+          <h4>Single-host Compose</h4>
+          <p>Fastest path: one VM runs Postgres, MinIO, Redis, and API together. Ideal for pilots, lab deployments, and consortium sandboxes.</p>
+        </div>
+        <div class="card">
+          <h4>Compose + external managed services</h4>
+          <p>Run only the API container (or API + Redis) and point <code>DATABASE_URL</code> and S3 settings at managed RDS/Cloud SQL and institutional S3.</p>
+        </div>
+        <div class="card">
+          <h4>Kubernetes / Nomad</h4>
+          <p>Split stateful sets (Postgres operator, MinIO tenant) from a stateless API Deployment. Use Ingress for TLS and path routing to <code>/api/v1</code>, <code>/ui</code>, <code>/docs</code>.</p>
+        </div>
+      </div>
+      <p>
+        Regardless of model, preserve the <strong>two-endpoint MinIO pattern</strong>: an internal
+        endpoint for the API container and a <strong>public</strong> endpoint embedded in presigned
+        links returned to browsers. Mixing these is the most common production defect.
+      </p>
+
+      <h3 id="deploy-compose">Docker Compose (single host)</h3>
+      <p>
+        The reference stack is defined in <code>docker-compose.yml</code>. Migrations run automatically
+        when the API container starts (<code>RUN_MIGRATIONS=true</code> in the entrypoint).
+      </p>
+      <ol class="steps">
+        <li>
+          <div>
+            <strong>Prepare configuration.</strong>
+            <pre><span class="pre-label">bash</span><code>cd fairdatahive
+cp .env.example .env
+# Edit .env — see “Production environment” below</code></pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Build the API image</strong> (after any code or dependency change):
+            <pre><span class="pre-label">bash</span><code>docker compose build api</code></pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Start data services and wait for Postgres.</strong>
+            <pre><span class="pre-label">bash</span><code>docker compose up -d postgres minio redis
+docker compose ps   # postgres should show “healthy”</code></pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Start the API.</strong>
+            <pre><span class="pre-label">bash</span><code>docker compose up -d api
+docker compose logs -f api   # watch migrations, then “Application startup complete”</code></pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Verify health and catalog surface.</strong>
+            <pre><span class="pre-label">bash</span><code>curl -s http://localhost:8002/api/v1/health | jq .
+curl -s http://localhost:8002/api/v1/oai?verb=Identify | head</code></pre>
+            <p>Open <a href="http://localhost:8002/docs">documentation</a> and <a href="http://localhost:8002/swagger">Swagger</a> on the host port you publish.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="callout warning">
+        <span class="callout-icon">⚠</span>
+        <div class="callout-body">
+          <p><strong>Do not run a Dockerized Vite dev server in production.</strong> Use a static build served at <code>/ui</code> (see below). A second Node container caused duplicate ports and root-owned caches in development; it is intentionally removed from Compose.</p>
+        </div>
+      </div>
+
+      <h3 id="deploy-ui">Serving the React UI</h3>
+      <p>
+        The catalog UI is a static SPA. For production, build once and let the API serve it from
+        <code>frontend/dist</code> (mounted when the directory exists at image build time or copied in).
+      </p>
+      <pre><span class="pre-label">bash</span><code>cd frontend
+npm ci
+npm run build
+cd ..
+docker compose build api
+docker compose up -d --force-recreate api</code></pre>
+      <p>
+        Users open <code>https://&lt;your-host&gt;/ui/</code> (the API redirects <code>/</code> when
+        the build is present). Set <code>CORS_ORIGINS</code> to your public UI origin if the UI is
+        hosted on another hostname; when served from the same API host, CORS is less critical but
+        token-based API calls from browsers still require correct origins if split.
+      </p>
+      <p>
+        For CDN deployment, upload <code>frontend/dist/*</code> and point the CDN at the same
+        <code>VITE_API_BASE</code> public API URL used at build time, or rebuild with
+        <code>VITE_API_BASE=https://catalog.example.org/api/v1</code>.
+      </p>
+
+      <h3 id="deploy-storage">Object storage</h3>
+      <h4>MinIO in Compose (default)</h4>
+      <p>
+        The API talks to MinIO on the internal Docker network (<code>MINIO_ENDPOINT=http://minio:9000</code>).
+        Browsers must never receive that hostname in presigned URLs.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Compose / dev</th><th>Production example</th></tr></thead>
+          <tbody>
+            <tr><td><code>MINIO_ENDPOINT</code></td><td><code>http://minio:9000</code></td><td>Internal service URL (K8s DNS, VPC endpoint)</td></tr>
+            <tr><td><code>MINIO_PUBLIC_ENDPOINT</code></td><td><code>http://localhost:9002</code></td><td><code>https://s3.catalog.example.org</code> or public MinIO ingress</td></tr>
+            <tr><td><code>MINIO_BUCKET</code></td><td><code>fairdatahive-catalog</code></td><td>Institutional bucket name; create before first upload</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        After changing <code>MINIO_PUBLIC_ENDPOINT</code>, recreate the API container. Test by
+        publishing a resource, downloading a file, and confirming the presigned URL host matches
+        what clients can resolve.
+      </p>
+      <h4>External S3 (AWS, Ceph, institutional MinIO cluster)</h4>
+      <p>
+        FairDataHive uses S3-compatible APIs via <code>aioboto3</code>. Point <code>MINIO_ENDPOINT</code>
+        at the vendor endpoint, set keys and bucket, and set <code>MINIO_PUBLIC_ENDPOINT</code> to the
+        same public base users hit (or CloudFront in front of the bucket). Ensure CORS on the bucket
+        allows GET from your catalog origin if browsers fetch objects directly.
+      </p>
+
+      <h3 id="deploy-database">Database and migrations</h3>
+      <p>
+        PostgreSQL must include the <code>vector</code> extension (image
+        <code>pgvector/pgvector:pg16</code> in Compose). The API runs
+        <code>alembic upgrade head</code> on startup when <code>RUN_MIGRATIONS=true</code>.
+      </p>
+      <ul>
+        <li><strong>First deploy</strong> — start Postgres, then API once; confirm logs show migrations applied.</li>
+        <li><strong>Upgrades</strong> — pull new image, run <code>docker compose up -d --force-recreate api</code>; entrypoint migrates before serving traffic.</li>
+        <li><strong>Manual migration</strong> — <code>docker compose run --rm --entrypoint alembic api upgrade head</code></li>
+        <li><strong>Backup</strong> — snapshot the <code>postgres-data</code> volume or use <code>pg_dump</code> on a schedule; test restore on a staging instance before you need it.</li>
+        <li><strong>Connection string</strong> — use <code>postgresql+asyncpg://</code> form in <code>DATABASE_URL</code>; pool sizing is handled by SQLAlchemy defaults unless you tune at the proxy layer (PgBouncer recommended for large fleets).</li>
+      </ul>
+      <div class="callout info">
+        <span class="callout-icon">ℹ</span>
+        <div class="callout-body">
+          <p>Metadata tombstones remain in Postgres when resources are deleted; files are removed from object storage. Backup policy should cover <strong>both</strong> DB and bucket for full recovery.</p>
+        </div>
+      </div>
+
+      <h3 id="deploy-auth">Authentication in production</h3>
+      <p>
+        Disable development authentication everywhere except local laptops:
+      </p>
+      <pre><span class="pre-label">env</span><code>DEV_AUTH_ENABLED=false
+KEYCLOAK_URL=https://idp.example.org
+KEYCLOAK_REALM=fairdatahive</code></pre>
+      <p>
+        The API validates JWTs via JWKS (<code>python-jose</code>, RS256, issuer checked). Configure
+        your IdP (Keycloak or institutional OIDC) to issue tokens with a stable <code>sub</code> claim —
+        that value becomes <code>owner_sub</code> / <code>publisher_sub</code> on records. The Compose
+        <code>auth</code> profile (<code>docker compose --profile auth up -d auth</code>) runs Keycloak
+        in <code>start-dev</code> mode; for production, run Keycloak (or another IdP) as its own
+        hardened deployment with a dedicated database and TLS.
+      </p>
+      <p>
+        UI users paste or store access tokens in the catalog header, or you integrate your institution’s
+        OAuth2 proxy in front of the UI and API. Plan token lifetime and refresh according to your
+        security policy; FairDataHive does not implement refresh-token flows itself.
+      </p>
+
+      <h3 id="deploy-proxy">Reverse proxy and TLS</h3>
+      <p>
+        Expose a single public hostname (e.g. <code>catalog.example.org</code>) and route paths to the API
+        container. Typical path map:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Path</th><th>Backend</th></tr></thead>
+          <tbody>
+            <tr><td><code>/api/v1/*</code></td><td>API (catalog REST)</td></tr>
+            <tr><td><code>/ui/*</code></td><td>Static UI (or dedicated CDN origin)</td></tr>
+            <tr><td><code>/docs</code></td><td>Project documentation (StaticFiles)</td></tr>
+            <tr><td><code>/swagger</code>, <code>/openapi.json</code></td><td>OpenAPI UI and schema</td></tr>
+            <tr><td><code>/metrics</code></td><td>Prometheus (restrict by network ACL)</td></tr>
+            <tr><td><code>/api/v1/oai</code></td><td>OAI-PMH harvesters (allow institutional IPs)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Set the public site URL in configuration:</p>
+      <pre><span class="pre-label">env</span><code>BASE_URL=https://catalog.example.org
+CORS_ORIGINS=https://catalog.example.org</code></pre>
+      <p>
+        Terminate TLS at the proxy (nginx, Traefik, Caddy, cloud LB). Increase
+        <code>client_max_body_size</code> (nginx) to at least your
+        <code>MAX_UPLOAD_SIZE_MB</code> plus overhead for multipart uploads.
+      </p>
+
+      <h3 id="deploy-env">Production environment</h3>
+      <p>
+        Example production-oriented <code>.env</code> (adjust hostnames and secrets):
+      </p>
+      <pre><span class="pre-label">env</span><code># Core
+DATABASE_URL=postgresql+asyncpg://fairdatahive:***@postgres:5432/fairdatahive
+REDIS_URL=redis://redis:6379/0
+BASE_URL=https://catalog.example.org
+RUN_MIGRATIONS=true
+
+# Object storage
+MINIO_ENDPOINT=http://minio:9000
+MINIO_PUBLIC_ENDPOINT=https://s3.catalog.example.org
+MINIO_ACCESS_KEY=***
+MINIO_SECRET_KEY=***
+MINIO_BUCKET=fairdatahive-catalog
+MAX_UPLOAD_SIZE_MB=500
+PRESIGNED_URL_EXPIRY_SECONDS=3600
+
+# Auth — required in production
+DEV_AUTH_ENABLED=false
+KEYCLOAK_URL=https://idp.example.org
+KEYCLOAK_REALM=fairdatahive
+CORS_ORIGINS=https://catalog.example.org
+
+# Search / FAIR
+EMBEDDING_MODEL=multi-qa-mpnet-base-dot-v1
+FAIR_SCORE_PUBLISH_THRESHOLD=0.4
+SEMANTIC_SEARCH_THRESHOLD=0.30
+
+# Optional
+SMTP_HOST=smtp.example.org
+SMTP_USER=***
+SMTP_PASSWORD=***
+EMAIL_FROM=noreply@catalog.example.org
+DATACITE_REPO_ID=***
+DATACITE_PASSWORD=***
+DATACITE_DOI_PREFIX=10.12345
+DATACITE_API_URL=https://api.datacite.org</code></pre>
+      <div class="callout danger">
+        <span class="callout-icon">!</span>
+        <div class="callout-body">
+          <p><strong>Never deploy with default MinIO credentials</strong> (<code>minioadmin</code>) or
+          <code>DEV_AUTH_ENABLED=true</code> on a network reachable by others. Rotate Postgres and
+          Redis passwords; restrict admin consoles (MinIO console, Keycloak) to management VPNs.</p>
+        </div>
+      </div>
+
+      <h3 id="deploy-ops">Operations: backup, upgrade, monitoring</h3>
+      <h4>Backup strategy</h4>
+      <ul>
+        <li><strong>PostgreSQL</strong> — nightly logical dump or volume snapshot; retain 30+ days for catalog compliance.</li>
+        <li><strong>Object storage</strong> — versioning/replication on the bucket; lifecycle rules for cost.</li>
+        <li><strong>Configuration</strong> — version-control <code>.env</code> templates without secrets; store secrets in a vault.</li>
+      </ul>
+      <h4>Upgrades</h4>
+      <ol class="steps">
+        <li>Snapshot DB and note current image tag.</li>
+        <li>Build/pull new API image; run migrations on staging first.</li>
+        <li><code>docker compose up -d --force-recreate api</code> (or rolling update in K8s).</li>
+        <li>Smoke-test: health, search, upload, download presign, OAI <code>Identify</code>.</li>
+        <li>Rebuild UI if API paths or env changed: <code>npm run build</code> then recreate API.</li>
+      </ol>
+      <h4>Monitoring</h4>
+      <p>
+        The API exposes Prometheus metrics at <code>/metrics</code> (instrumentator). Scrape from your
+        monitoring network only. Combine with:
+      </p>
+      <ul>
+        <li><code>GET /api/v1/health</code> — database and Redis connectivity</li>
+        <li>Container logs — structured via application logging; watch migration and presign errors</li>
+        <li>Disk usage on Postgres and object storage volumes</li>
+        <li>Redis memory — eviction is acceptable for cache but indicates heavy search load</li>
+      </ul>
+      <p>
+        Semantic search loads the sentence-transformers model on first use; expect a CPU/RAM spike
+        after cold start — plan readiness probes with generous <code>start_period</code> if you
+        autoscale API pods.
+      </p>
+
+      <h3 id="deploy-security">Security checklist</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Area</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Authentication</td><td><code>DEV_AUTH_ENABLED=false</code>; institutional OIDC; short-lived tokens</td></tr>
+            <tr><td>Transport</td><td>TLS 1.2+ everywhere; HSTS on public catalog host</td></tr>
+            <tr><td>Object storage</td><td>Unique keys; bucket policy least privilege; correct public endpoint</td></tr>
+            <tr><td>Database</td><td>Strong password; no public port; encrypted volume at rest if required by policy</td></tr>
+            <tr><td>Network</td><td>Redis and Postgres internal-only; restrict <code>/metrics</code> and MinIO console</td></tr>
+            <tr><td>Uploads</td><td>Enforce <code>MAX_UPLOAD_SIZE_MB</code>; scan at proxy or storage layer if policy requires AV</td></tr>
+            <tr><td>Private resources</td><td>Review access-request workflow; enable SMTP for auditability of grants</td></tr>
+            <tr><td>Dependencies</td><td>Rebuild images on security patches; pin base image digests in regulated environments</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        For incident response, catalog metadata and audit logs live in Postgres; download events are
+        recorded per distribution. Pair FairDataHive logs with reverse-proxy access logs for a full
+        trace of who retrieved which presigned URL.
+      </p>
+    </section>
+
+    <hr>
+
+    <!-- ── REACT UI ───────────────────────────────────────────── -->
+    <section id="react-ui">
+      <h2>React UI</h2>
+      <p>
+        The frontend is a standalone Vite + React 18 + TypeScript application located in
+        <code>frontend/</code>. It communicates entirely through the REST API and requires no
+        separate backend of its own.
+      </p>
+
+      <h3>How to run the UI</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Mode</th><th>Command</th><th>URL</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Development (recommended)</strong></td><td><code>npm run dev</code></td><td><a href="http://localhost:5173" target="_blank">http://localhost:5173</a> — hot reload, API proxy</td></tr>
+            <tr><td><strong>Production-like</strong></td><td><code>npm run build</code> then recreate API</td><td><a href="http://localhost:8002/ui/" target="_blank">http://localhost:8002/ui/</a></td></tr>
+            <tr><td><strong>Preview build</strong></td><td><code>npm run preview</code></td><td><a href="http://localhost:4173" target="_blank">http://localhost:4173</a> — static preview only</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Development server</h3>
+      <pre><span class="pre-label">bash</span><code># Terminal 1 — backend
+cd fairdatahive && docker compose up -d
+
+# Terminal 2 — frontend
+cd fairdatahive/frontend
+cp .env.example .env     # VITE_DEV_AUTH=true to match API dev auth
+npm install
+npm run dev              # guarded by scripts/dev-server.mjs → http://127.0.0.1:5173</code></pre>
+      <p>
+        <code>vite.config.ts</code> sets <code>strictPort: true</code> on port <strong>5173</strong> and binds
+        <code>127.0.0.1</code>. The <code>npm run dev</code> script stops any orphan process on
+        <strong>5174</strong> before starting (legacy second Vite instances).
+      </p>
+
+      <h3>Production build</h3>
+      <pre><span class="pre-label">bash</span><code>cd fairdatahive/frontend
+npm run build            # outputs to frontend/dist/
+
+cd ..
+docker compose build api && docker compose up -d --force-recreate api</code></pre>
+      <p>
+        When <code>frontend/dist/</code> exists, the API mounts it at <code>/ui</code> and redirects
+        <code>/</code> to <a href="http://localhost:8002/ui/" target="_blank">http://localhost:8002/ui/</a>
+        without a separate Node process.
+      </p>
+
+      <h3>Stop / restart dev server</h3>
+      <pre><span class="pre-label">bash</span><code>cd fairdatahive/frontend
+npm run dev:stop   # frees 5173 and any orphan 5174
+npm run dev        # single Vite on http://127.0.0.1:5173 only</code></pre>
+
+      <h3>Frontend environment variables</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>VITE_API_BASE</code></td><td><em>empty</em></td><td>Full API base URL. Leave empty to use the Vite proxy (<code>/api</code> → <code>localhost:8002</code>).</td></tr>
+            <tr><td><code>VITE_DEV_AUTH</code></td><td><code>true</code></td><td>When <code>true</code>, seeds the token field with <code>dev</code> on first load.</td></tr>
+            <tr><td><code>VITE_API_PROXY</code></td><td><code>http://localhost:8002</code></td><td>Proxy target for <code>vite.config.ts</code> when overriding the default API port.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── UI GUIDE ──────────────────────────────────────────── -->
+    <section id="ui-guide">
+      <h2>UI Usage Guide</h2>
+
+      <h3>Header controls</h3>
+      <p>The top bar contains navigation links, a scope selector, and an authentication token field.</p>
+      <ul>
+        <li><strong>Scope selector</strong> — switches between the <em>public catalog</em> (all published resources) and a named <em>project scope</em>. When a project ID is entered, browse, search, and create operations are scoped to that project.</li>
+        <li><strong>Token field</strong> — paste a JWT access token here for Keycloak-authenticated requests. With <code>DEV_AUTH_ENABLED=true</code>, this field can be left empty or set to any value.</li>
+      </ul>
+
+      <h3>Search</h3>
+      <p>
+        The Search page supports three modes selectable from the dropdown next to the search box:
+      </p>
+      <ul>
+        <li><strong>Auto</strong> (default) — runs keyword search first; falls back to semantic search when fewer than 3 keyword results are found.</li>
+        <li><strong>Keyword</strong> — PostgreSQL full-text search over title, description, theme, and keywords; if FTS finds no hits, a case-insensitive substring fallback matches partial words and theme names.</li>
+        <li><strong>Semantic</strong> — natural-language queries matched by cosine similarity against stored embeddings.</li>
+      </ul>
+      <p>Facet filters for <em>theme</em>, <em>license</em>, and <em>format</em> appear once a query is submitted.</p>
+
+      <h3>Creating a resource</h3>
+      <p>
+        The Create page registers a new DCAT dataset in the current scope. You need at least one
+        distribution to publish; metadata and files can be combined in a single save.
+      </p>
+      <ol class="steps">
+        <li>
+          <div><strong>Navigate to Create</strong> in the top navigation.</div>
+        </li>
+        <li>
+          <div>
+            <strong>Fill in the metadata form.</strong>
+            <ul>
+              <li><strong>Title</strong> — display name in the catalog and search results.</li>
+              <li><strong>Description</strong> (min 50 characters) — what the data is and how to use it.</li>
+              <li><strong>Keywords</strong> (min 2, comma-separated) — discovery tags for search and facets.</li>
+              <li><strong>Theme</strong> — research domain from the catalog vocabulary.</li>
+              <li><strong>License</strong> — SPDX-style licence; required before publish.</li>
+              <li><strong>Private resource</strong> — when checked, downloads require owner approval via access requests.</li>
+            </ul>
+            <p>
+              Additional fields (provenance, spatial/temporal coverage, DOI, language) are available
+              via the API when creating or patching a resource.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Add at least one distribution.</strong> Each option adds a separate
+            <code>dcat:Distribution</code>; you may use one or several.
+            <ul>
+              <li>
+                <em>File upload</em> — data stored in FairDataHive (MinIO). Files upload as you
+                select them; ZIP archives are unpacked and each member can be linked. Download on the
+                resource page uses a presigned URL.
+              </li>
+              <li>
+                <em>External URL</em> — a link to data hosted elsewhere (Zenodo, Figshare, a lab
+                file server, a landing page). Recorded as <code>access_url</code> only. Use for static
+                files or human-oriented pages, not for describing a programmatic API.
+              </li>
+              <li>
+                <em>API / data service URL</em> — the root of a REST or other machine-facing
+                service. Recorded as both <code>access_url</code> (where to reach the data) and a linked
+                <code>dcat:DataService</code> with <code>endpoint_url</code> (for RDF export and
+                harvesters). The Create form sets both to the same URL. Use when consumers call an API
+                rather than download a fixed file.
+              </li>
+            </ul>
+            <div class="callout info">
+              <span class="callout-icon">↔</span>
+              <div class="callout-body">
+                <p>
+                  <strong>External URL vs API</strong> — same hostname, different intent: external =
+                  “get the file or page here”; API = “access via a data service”. Example external:
+                  <code>https://zenodo.org/…/files/data.csv</code>. Example API:
+                  <code>https://api.example.com/v1/measurements</code>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Save as draft or publish immediately.</strong> Enabling <em>Publish immediately</em>
+            runs the publish guard after saving (licence, at least one distribution, FAIR score ≥
+            threshold). If the guard fails, the record stays a draft and failing checks are shown on
+            the resource page.
+          </div>
+        </li>
+      </ol>
+
+      <h3>Resource detail page</h3>
+      <p>The resource page shows:</p>
+      <ul>
+        <li>Full metadata and version history (sidebar)</li>
+        <li>FAIR score breakdown with suggestions (sidebar)</li>
+        <li>Distributions with Download buttons (generates a presigned URL)</li>
+        <li>Actions: Publish (for drafts), Landing page link, RDF (Turtle) link</li>
+        <li>Access request button (for private resources the user cannot download)</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- ── API: CATALOG ──────────────────────────────────────── -->
+    <section id="api-catalog">
+      <h2>API — Catalog</h2>
+      <p>All API routes are prefixed with <code>/api/v1</code>.</p>
+
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/catalog</span><span class="endpoint-desc">List up to 100 published resources. Filter by <code>?scope=</code>.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/catalog.ttl</span><span class="endpoint-desc">Full catalog as W3C DCAT Turtle.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/catalog.jsonld</span><span class="endpoint-desc">Full catalog as DCAT JSON-LD.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/catalog/stats</span><span class="endpoint-desc">Aggregate counts — resources, versions, distributions, by-theme, by-license.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/licenses</span><span class="endpoint-desc">Supported license vocabulary (SPDX-based).</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/themes</span><span class="endpoint-desc">Available research domain themes.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/health</span><span class="endpoint-desc">Liveness probe — reports database and cache status.</span></div>
+    </section>
+
+    <!-- ── API: RESOURCES ────────────────────────────────────── -->
+    <section id="api-resources">
+      <h2>API — Resources</h2>
+
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/resources</span><span class="endpoint-desc">Create a new resource (draft). Returns a <code>ResourceVersionRead</code>.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources</span><span class="endpoint-desc">Paginated list of published resources. Supports <code>?scope=&page=&size=</code>.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{version_id}</span><span class="endpoint-desc">Get a specific version. Supports content negotiation: <code>text/turtle</code> or <code>application/ld+json</code>.</span></div>
+      <div class="endpoint"><span class="method patch">PATCH</span><span class="endpoint-path">/resources/{version_id}</span><span class="endpoint-desc">Update a draft's metadata. Only the owner may patch.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/resources/{version_id}/publish</span><span class="endpoint-desc">Publish a draft. Runs the publish guard (license + distribution + FAIR score).</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/resources/{version_id}/deprecate</span><span class="endpoint-desc">Mark a version as deprecated.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{base_id}/versions</span><span class="endpoint-desc">All versions of a resource ordered by date.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{base_id}/latest</span><span class="endpoint-desc">Redirect (307) to the current published version.</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/resources/{base_id}/versions</span><span class="endpoint-desc">Create a new version from an existing published resource.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method delete">DELETE</span><span class="endpoint-path">/resources/{base_id}</span><span class="endpoint-desc">Tombstone a resource — metadata is retained, files and downloads are removed.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{version_id}/fair-score</span><span class="endpoint-desc">Compute and return the FAIR score for a version.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{version_id}.ttl</span><span class="endpoint-desc">Resource metadata as Turtle.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{version_id}.jsonld</span><span class="endpoint-desc">Resource metadata as JSON-LD.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{version_id}/landing</span><span class="endpoint-desc">HTML landing page with embedded JSON-LD and FAIR score.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{version_id}/dcat-ap-report</span><span class="endpoint-desc">SHACL validation report (Turtle) against DCAT-AP 3 shapes.</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/resources/{version_id}/mint-doi</span><span class="endpoint-desc">Mint a DOI via the DataCite Fabrica API.</span><span class="auth-required">auth</span></div>
+
+      <h3>Create resource — request body</h3>
+      <pre><span class="pre-label">json</span><code>{
+  "scope": "public",               // "public" or a project ID string
+  "title": "Corrosion impedance study",
+  "description": "EIS measurements on AA2024 alloy coated with…",
+  "keywords": ["electrochemistry", "EIS", "AA2024"],
+  "theme": "Electrochemistry",
+  "license_id": "CC-BY-4.0",
+  "language": "en",
+  "provenance": "Collected at VIPCOAT lab, Vienna 2024…",
+  "is_private": false,
+  "datasets": [
+    {
+      "distributions": [
+        {
+          "dist_type": "upload",
+          "upload_token": "public/draft-dev-user-abc/abc123-data.csv",
+          "media_type": "text/csv",
+          "checksum_sha256": "…",
+          "byte_size": 45231
+        }
+      ]
+    }
+  ]
+}</code></pre>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠</span>
+        <div class="callout-body">
+          <p><strong>Publish guard</strong> — a draft cannot be published unless all three conditions are met: (1) a <code>license_id</code> is set, (2) at least one distribution exists, and (3) the overall FAIR score ≥ <code>FAIR_SCORE_PUBLISH_THRESHOLD</code> (default 0.40).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── API: FILES ─────────────────────────────────────────── -->
+    <section id="api-files">
+      <h2>API — Files</h2>
+      <p>
+        Files are uploaded independently before (or during) resource creation. The returned
+        <code>upload_token</code> is the MinIO object key and must be included in a
+        <code>DistributionCreate</code> payload when creating or patching a resource.
+      </p>
+
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/files/upload</span><span class="endpoint-desc">Multipart file upload. Returns object key, SHA-256 checksum, byte size, and extracted files for ZIPs.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/distributions/{id}/download</span><span class="endpoint-desc">Generate a presigned download URL. Enforces authentication and access rights for private resources.</span></div>
+
+      <h3>Upload flow</h3>
+      <pre><span class="pre-label">bash</span><code># 1. Upload the file
+curl -F "file=@data.csv" \
+     "http://localhost:8002/api/v1/files/upload?scope=public"
+
+# Response:
+# { "upload_token": "public/draft-dev-user-abc/8fa3-data.csv", … }
+
+# 2. Reference the token in the resource payload
+# "distributions": [{ "dist_type": "upload", "upload_token": "public/…" }]</code></pre>
+
+      <p>
+        ZIP archives are automatically extracted. Each member file is uploaded individually and
+        returned as <code>extracted_files</code> in the response. You can add each extracted
+        file as a separate distribution.
+      </p>
+    </section>
+
+    <!-- ── API: SEARCH ────────────────────────────────────────── -->
+    <section id="api-search">
+      <h2>API — Search</h2>
+
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/search</span><span class="endpoint-desc">Unified search — keyword, semantic, or auto. Returns hits with relevance scores and facets.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/search/suggest</span><span class="endpoint-desc">Title autocomplete for a prefix (minimum 2 characters).</span></div>
+
+      <h3>Query parameters for <code>/search</code></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Parameter</th><th>Values</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>q</code></td><td>Free-text query string</td><td>—</td></tr>
+            <tr><td><code>mode</code></td><td><code>auto</code> | <code>keyword</code> | <code>semantic</code></td><td><code>auto</code></td></tr>
+            <tr><td><code>scope</code></td><td><code>public</code> or project ID</td><td>all</td></tr>
+            <tr><td><code>theme</code></td><td>theme ID from <code>/themes</code></td><td>—</td></tr>
+            <tr><td><code>license_id</code></td><td>SPDX license ID from <code>/licenses</code></td><td>—</td></tr>
+            <tr><td><code>page</code> / <code>size</code></td><td>integers</td><td>1 / 20</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Search results are cached in Redis (300 s for keyword, 120 s for semantic). The cache is invalidated when a resource in the same scope is published or deleted.</p>
+    </section>
+
+    <!-- ── API: ACCESS ────────────────────────────────────────── -->
+    <section id="api-access">
+      <h2>API — Access Control</h2>
+
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/resources/{version_id}/access</span><span class="endpoint-desc">Check download access for the current user.</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/access-requests</span><span class="endpoint-desc">Submit an access request to the resource owner.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/access-requests/incoming</span><span class="endpoint-desc">List access requests for resources the current user owns.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/access-requests/outgoing</span><span class="endpoint-desc">List the current user's own submitted requests.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/access-requests/{id}/accept</span><span class="endpoint-desc">Accept a request — adds requester's sub to <code>access_rights</code>.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method post">POST</span><span class="endpoint-path">/access-requests/{id}/reject</span><span class="endpoint-desc">Reject a pending request.</span><span class="auth-required">auth</span></div>
+      <div class="endpoint"><span class="method delete">DELETE</span><span class="endpoint-path">/access-requests/{id}/revoke</span><span class="endpoint-desc">Revoke a previously accepted request.</span><span class="auth-required">auth</span></div>
+
+      <p>
+        Access requests expire automatically after <code>ACCESS_REQUEST_EXPIRY_DAYS</code> (default 30).
+        A background task runs every 6 hours to purge expired pending requests.
+        When a request is accepted or rejected, an in-app notification is created for the requester.
+        If SMTP is configured, an email is also sent.
+      </p>
+    </section>
+
+    <!-- ── API: INTEROP ──────────────────────────────────────── -->
+    <section id="api-interop">
+      <h2>API — Interoperability</h2>
+
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/oai</span><span class="endpoint-desc">OAI-PMH endpoint. Supports all 6 verbs: <code>Identify</code>, <code>ListMetadataFormats</code>, <code>ListSets</code>, <code>ListIdentifiers</code>, <code>ListRecords</code>, <code>GetRecord</code>. Formats: <code>oai_dc</code>, <code>dcat</code>.</span></div>
+      <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/v1/context.jsonld</span><span class="endpoint-desc">Shared JSON-LD context document.</span></div>
+
+      <h3>OAI-PMH usage examples</h3>
+      <pre><span class="pre-label">bash</span><code># Identify the repository
+curl "http://localhost:8002/api/v1/oai?verb=Identify"
+
+# List all records (Dublin Core)
+curl "http://localhost:8002/api/v1/oai?verb=ListRecords&metadataPrefix=oai_dc"
+
+# Harvest a specific scope as a set
+curl "http://localhost:8002/api/v1/oai?verb=ListRecords&metadataPrefix=dcat&set=project-alpha"
+
+# Incremental harvest from a date
+curl "http://localhost:8002/api/v1/oai?verb=ListRecords&metadataPrefix=oai_dc&from=2025-01-01"</code></pre>
+    </section>
+
+    <hr>
+
+    <!-- ── DATA MODEL ─────────────────────────────────────────── -->
+    <section id="data-model">
+      <h2>Data Model</h2>
+      <p>The catalog model follows W3C DCAT 3 concepts.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Resource</h4>
+          <p>A logical dataset identified by a stable <code>base_resource_id</code>. Owns all versions. Has a scope and an owner (user <code>sub</code>).</p>
+        </div>
+        <div class="card">
+          <h4>ResourceVersion</h4>
+          <p>One snapshot of metadata and files. States: <code>draft</code> → <code>published</code> → <code>deprecated</code>. Carries all DCAT fields.</p>
+        </div>
+        <div class="card">
+          <h4>Dataset</h4>
+          <p>Logical grouping of distributions within a version. Maps to <code>dcat:Dataset</code>.</p>
+        </div>
+        <div class="card">
+          <h4>Distribution</h4>
+          <p>A single access point — <code>upload</code> (MinIO), <code>external</code> link
+            (<code>access_url</code>), or <code>api</code> service (<code>access_url</code> plus
+            <code>dcat:DataService</code>). See <a href="#ui-guide">Creating a resource</a> for when
+            to use each.</p>
+        </div>
+      </div>
+
+      <h3>Version lifecycle</h3>
+      <pre><code>POST /resources  →  draft
+                    │
+                    ▼  (publish guard passes)
+              POST /publish  →  published  ←──── current version
+                                    │
+                                    ▼  (owner creates new version)
+                              POST /versions  →  new draft
+                                    │
+                                    ▼
+                              POST /publish  →  new published  ←── current version
+                              (previous version transitions to deprecated)
+
+DELETE /resources  →  tombstone  (data_deleted=true, metadata retained)</code></pre>
+
+      <h3>Scopes</h3>
+      <p>
+        Every resource carries a <code>scope</code> string — either <code>"public"</code> or an
+        arbitrary project identifier. Scopes are not enforced by membership; they function as a
+        namespace and filter. Any authenticated user may create resources in any scope.
+      </p>
+    </section>
+
+    <!-- ── FAIR ──────────────────────────────────────────────── -->
+    <section id="fair">
+      <h2>FAIR Scoring</h2>
+      <p>
+        Each resource version receives a FAIR score in the range <code>[0.0, 1.0]</code> computed
+        as the average of four dimension scores. Each dimension score is the fraction of passing
+        checks within that dimension.
+      </p>
+
+      <div class="fair-grid">
+        <div class="fair-card">
+          <div class="letter">F</div>
+          <h4>Findable</h4>
+          <ul>
+            <li>Has a non-empty title</li>
+            <li>Description ≥ 50 characters</li>
+            <li>At least 2 keywords</li>
+            <li>Theme is set</li>
+            <li>DOI is registered</li>
+          </ul>
+        </div>
+        <div class="fair-card">
+          <div class="letter">A</div>
+          <h4>Accessible</h4>
+          <ul>
+            <li>At least one distribution</li>
+            <li>Access rights defined (for private resources)</li>
+            <li>Access or download URL present on all distributions</li>
+          </ul>
+        </div>
+        <div class="fair-card">
+          <div class="letter">I</div>
+          <h4>Interoperable</h4>
+          <ul>
+            <li>License is set</li>
+            <li>Language (BCP-47) is set</li>
+            <li>IANA media type on all distributions</li>
+            <li>Publisher profile is resolvable</li>
+          </ul>
+        </div>
+        <div class="fair-card">
+          <div class="letter">R</div>
+          <h4>Reusable</h4>
+          <ul>
+            <li>Provenance description present (≥ 20 chars)</li>
+            <li>Rights statement present</li>
+            <li>SHA-256 checksum on all uploaded files</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ</span>
+        <div class="callout-body">
+          <p>The overall FAIR score must meet or exceed <code>FAIR_SCORE_PUBLISH_THRESHOLD</code> (default <code>0.40</code>) before a draft can be published. The API returns actionable suggestions for each failing check.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AUTH ──────────────────────────────────────────────── -->
+    <section id="auth">
+      <h2>Authentication</h2>
+      <p>
+        FairDataHive uses <strong>Bearer JWT</strong> authentication. Tokens are validated against
+        the JWKS endpoint of a configured Keycloak realm. Authorization is resource-centric —
+        the JWT <code>sub</code> claim is used as the owner and permission anchor; no Keycloak
+        roles are enforced by the application.
+      </p>
+
+      <h3>JWT validation flow</h3>
+      <ol class="steps">
+        <li>Request arrives with <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+        <li>API fetches JWKS from Keycloak (cached for 1 hour).</li>
+        <li>Token is verified with <code>python-jose</code> (RS256, issuer checked, audience not checked).</li>
+        <li>Claims are mapped to <code>CurrentUser(sub, email, name, preferred_username)</code>.</li>
+        <li>The <code>sub</code> claim is stored as <code>owner_sub</code> / <code>publisher_sub</code> on created records.</li>
+      </ol>
+
+      <h3>Endpoint protection summary</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Scope</th><th>Requirement</th></tr></thead>
+          <tbody>
+            <tr><td>Read published resources, search, catalog, RDF, OAI-PMH</td><td>None — open access</td></tr>
+            <tr><td>Download from a public distribution</td><td>None</td></tr>
+            <tr><td>Download from a private distribution</td><td>Authenticated + listed in <code>access_rights</code> or owner</td></tr>
+            <tr><td>Create / patch / publish / delete resources, upload files</td><td>Authenticated (any valid user)</td></tr>
+            <tr><td>Mutate another user's resource</td><td>Blocked — 403 Forbidden</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Development mode</h3>
+      <p>
+        Setting <code>DEV_AUTH_ENABLED=true</code> bypasses all JWT processing. Every request —
+        including those without any <code>Authorization</code> header — is treated as
+        <code>dev-user</code>. <strong>Do not use this in production or any shared deployment.</strong>
+      </p>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠</span>
+        <div class="callout-body">
+          <p>The React UI does not include an OIDC login flow. For Keycloak-authenticated deployments, obtain a token externally (Keycloak login page, client credentials, etc.) and paste it into the token field in the header bar.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SEARCH DETAIL ──────────────────────────────────────── -->
+    <section id="search-detail">
+      <h2>Search Engine</h2>
+
+      <h3>Keyword search (PostgreSQL FTS + fallback)</h3>
+      <p>
+        A GIN index over <code>to_tsvector('english', …)</code> covers title, description, theme,
+        and keywords (see migrations <code>0002_search_indexes</code> and
+        <code>0004_expand_fts_index</code>). Searches use <code>plainto_tsquery</code> and
+        <code>ts_rank</code>. A two-step query (IDs + scores first, then entity load) avoids ORM
+        eager-load conflicts.
+      </p>
+      <p>
+        When FTS returns no rows (e.g. partial tokens like <code>Comput</code> or theme-only
+        matches), the API falls back to <code>ILIKE</code> substring search on the same text
+        fields so the UI still returns relevant catalog entries.
+      </p>
+
+      <h3>Semantic search (pgvector)</h3>
+      <p>
+        On publish, a background task encodes the concatenated title, description, keywords, and
+        theme into a 768-dimensional vector using the configured sentence-transformers model
+        (<code>multi-qa-mpnet-base-dot-v1</code> by default). Vectors are stored in the
+        <code>embedding</code> column (pgvector type). Search uses cosine similarity
+        (<code>&lt;=&gt;</code> operator) with a configurable threshold.
+      </p>
+
+      <h3>Auto mode</h3>
+      <p>
+        Keyword search runs first. If the result count is fewer than 3, semantic search is also
+        run. Unique semantic results are merged into the keyword results and the combined list is
+        returned with <code>"mode_used": "auto"</code>.
+      </p>
+
+      <h3>Caching</h3>
+      <p>
+        Results are cached in Redis keyed by a SHA-256 hash of the query parameters. TTLs are
+        300 seconds for keyword results and 120 seconds for semantic results. The cache for a
+        scope is invalidated whenever a resource in that scope is published or deleted.
+      </p>
+    </section>
+
+    <hr>
+
+    <!-- ── LOCAL DEV ──────────────────────────────────────────── -->
+    <section id="local-dev">
+      <h2>Local Development (without Docker)</h2>
+      <p>
+        You need a running PostgreSQL 16 instance with the <code>pgvector</code> extension
+        enabled, plus Redis and MinIO (or a local MinIO binary).
+      </p>
+
+      <pre><span class="pre-label">bash</span><code># Create and activate a virtual environment
+python3.12 -m venv .venv
+source .venv/bin/activate
+
+# Install all dependencies including dev tools
+pip install -r requirements.txt
+pip install pytest pytest-asyncio httpx aiosqlite
+
+# Set environment variables (override .env or export directly)
+export DATABASE_URL="postgresql+asyncpg://fairdatahive:fairdatahive@localhost:5432/fairdatahive"
+export DEV_AUTH_ENABLED=true
+
+# Run migrations
+alembic upgrade head
+
+# Start the API with hot reload
+uvicorn app.main:app --reload --port 8002
+
+# In another terminal — React UI (proxies to :8002)
+cd frontend && cp .env.example .env && npm install && npm run dev</code></pre>
+    </section>
+
+    <!-- ── TESTING ────────────────────────────────────────────── -->
+    <section id="testing">
+      <h2>Testing</h2>
+      <p>
+        The test suite uses <code>pytest-asyncio</code> with an in-memory SQLite database.
+        No PostgreSQL, Redis, or MinIO instance is required to run the tests.
+      </p>
+
+      <pre><span class="pre-label">bash</span><code># Run all tests
+TESTING=1 pytest tests/ -q
+
+# Run a specific test file
+TESTING=1 pytest tests/test_search.py -v
+
+# Skip integration tests (require real PostgreSQL + pgvector)
+TESTING=1 pytest tests/ -m "not integration" -q</code></pre>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Test file</th><th>Coverage area</th></tr></thead>
+          <tbody>
+            <tr><td><code>test_resources.py</code></td><td>CRUD, publish guard, versioning, tombstones</td></tr>
+            <tr><td><code>test_search.py</code></td><td>Keyword search, suggest, catalog stats, licenses, themes</td></tr>
+            <tr><td><code>test_fair.py</code></td><td>FAIR score computation across all dimensions</td></tr>
+            <tr><td><code>test_rdf.py</code></td><td>Turtle parsing, catalog graph, content negotiation</td></tr>
+            <tr><td><code>test_access.py</code></td><td>Access request lifecycle, private download guard</td></tr>
+            <tr><td><code>test_audit.py</code></td><td>Download logging, notifications, stats endpoint</td></tr>
+            <tr><td><code>test_oai.py</code></td><td>OAI-PMH verbs, deleted record handling</td></tr>
+            <tr><td><code>test_health.py</code></td><td>Health endpoint, static assets, root response</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── TROUBLESHOOTING ────────────────────────────────────── -->
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>Authentication required</code> on all requests</td>
+              <td><code>DEV_AUTH_ENABLED</code> not active in the running container</td>
+              <td>Confirm <code>.env</code> exists and set the variable; rebuild: <code>docker compose build api &amp;&amp; docker compose up -d --force-recreate api</code></td>
+            </tr>
+            <tr>
+              <td>Download link opens <code>http://minio:9000/…</code> in browser</td>
+              <td>Presigned URL uses Docker hostname</td>
+              <td>Set <code>MINIO_PUBLIC_ENDPOINT=http://localhost:9002</code> in <code>.env</code> and recreate the API container</td>
+            </tr>
+            <tr>
+              <td>Port <code>9000</code> already in use</td>
+              <td>Another MinIO on the host (e.g. old stack)</td>
+              <td>Compose maps MinIO to <strong>9002</strong> (S3) and <strong>9003</strong> (console). Use <code>MINIO_PUBLIC_ENDPOINT=http://localhost:9002</code>.</td>
+            </tr>
+            <tr>
+              <td><code>Search returns 500</code> with a query string</td>
+              <td>Known FTS issue (fixed) — image out of date</td>
+              <td>Rebuild: <code>docker compose build api &amp;&amp; docker compose up -d --force-recreate api</code></td>
+            </tr>
+            <tr>
+              <td>Port <code>5432</code> already in use</td>
+              <td>Another PostgreSQL on the host</td>
+              <td>Compose maps to host port <strong>5434</strong> (<code>5434:5432</code>). Connect via <code>localhost:5434</code>.</td>
+            </tr>
+            <tr>
+              <td>Port <code>8000</code> or <code>8001</code> already in use</td>
+              <td>Another API on the host (e.g. legacy stack on 8001)</td>
+              <td>Compose maps to host port <strong>8002</strong> (<code>8002:8000</code>). Use <code>http://localhost:8002</code>.</td>
+            </tr>
+            <tr>
+              <td>Port <code>6379</code> bind error on <code>redis</code></td>
+              <td>Old compose published Redis on the host</td>
+              <td>Redis is no longer published to the host. Run <code>docker compose down</code> then <code>docker compose up -d</code>.</td>
+            </tr>
+            <tr>
+              <td>Same page on <code>5173</code> and <code>5174</code></td>
+              <td>Two Vite dev servers (second bound <code>5174</code> when <code>5173</code> was busy)</td>
+              <td><code>cd frontend && npm run dev:stop</code> then <code>npm run dev</code>. Use only <strong>5173</strong>. Compose no longer includes a Docker Vite service.</td>
+            </tr>
+            <tr>
+              <td><code>Port 5173 is already in use</code></td>
+              <td>Another Vite or process holds <code>5173</code></td>
+              <td><code>cd frontend && npm run dev:stop</code>, or end the other terminal's <code>npm run dev</code>. Check: <code>ss -tlnp | grep 5173</code></td>
+            </tr>
+            <tr>
+              <td>Nothing at <code>http://localhost:5173</code></td>
+              <td>Vite not running</td>
+              <td><code>cd frontend && npm run dev</code> (API on <code>8002</code>), or use <a href="http://localhost:8002/ui/">http://localhost:8002/ui/</a> after <code>npm run build</code></td>
+            </tr>
+            <tr>
+              <td><code>EACCES</code> on <code>node_modules/.vite</code></td>
+              <td>Root-owned cache (e.g. old Docker Vite container)</td>
+              <td>From <code>fairdatahive/</code>: <code>docker run --rm -v "$(pwd)/frontend:/app" -w /app node:20-alpine rm -rf /app/node_modules/.vite/deps</code> then <code>npm run dev</code></td>
+            </tr>
+            <tr>
+              <td>Keyword search returns no results</td>
+              <td>Query not in catalog text, or API image out of date</td>
+              <td>Rebuild API; try full words or theme names. Partial matches use ILIKE fallback when FTS is empty.</td>
+            </tr>
+            <tr>
+              <td><code>Temporary failure in name resolution</code> for <code>postgres</code></td>
+              <td><code>.env</code> missing or postgres not running</td>
+              <td>Run <code>cp .env.example .env</code> then <code>docker compose up -d postgres</code> and wait for healthy</td>
+            </tr>
+            <tr>
+              <td>Migrations fail on API startup</td>
+              <td>Database not ready or schema drift</td>
+              <td>Wait for healthy Postgres, then: <code>docker compose run --rm --entrypoint alembic api upgrade head</code>. Migrations run automatically via <code>RUN_MIGRATIONS=true</code> in the API entrypoint.</td>
+            </tr>
+            <tr>
+              <td>Publish fails with FAIR score error</td>
+              <td>Score below 0.40 threshold</td>
+              <td>Check <code>GET /resources/{id}/fair-score</code> for failing checks and suggestions</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Useful diagnostic commands</h3>
+      <pre><span class="pre-label">bash</span><code># Check dev auth is active
+curl http://localhost:8002/api/v1/users/me
+# Should return {"sub":"dev-user",…} without any Authorization header
+
+# Check service health
+curl http://localhost:8002/api/v1/health
+
+# View API logs
+docker compose logs api --tail 50 -f
+
+# Confirm env inside the container
+docker compose exec api printenv DEV_AUTH_ENABLED
+
+# Stop stray Vite on 5173 / 5174
+cd frontend && npm run dev:stop
+
+# Rebuild API after code or migration changes
+docker compose build api && docker compose up -d --force-recreate api</code></pre>
+    </section>
+
+    <hr>
+
+    <p style="text-align:center;color:var(--muted);font-size:0.8rem;padding:1rem 0 0;">
+      FairDataHive v1.0.0 &nbsp;·&nbsp; Built on FastAPI, PostgreSQL, pgvector, MinIO, Redis &nbsp;·&nbsp;
+      <a href="#quickstart">Get started</a>
+    </p>
+
+  </main>
+</div>
+
+<script>
+  /* Active nav link on scroll */
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('nav.sidebar a[href^="#"]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(a => a.classList.remove('active'));
+        const match = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

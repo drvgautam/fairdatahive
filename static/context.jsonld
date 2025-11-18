@@ -1,0 +1,44 @@
+{
+  "@context": {
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "spdx": "http://spdx.org/rdf/terms#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "app": "https://fairdatahive.io/vocab#",
+
+    "title": {"@id": "dcterms:title"},
+    "description": {"@id": "dcterms:description"},
+    "publisher": {"@id": "dcterms:publisher", "@type": "@id"},
+    "issued": {"@id": "dcterms:issued", "@type": "xsd:dateTime"},
+    "modified": {"@id": "dcterms:modified", "@type": "xsd:dateTime"},
+    "license": {"@id": "dcterms:license", "@type": "@id"},
+    "identifier": {"@id": "dcterms:identifier", "@type": "@id"},
+    "isVersionOf": {"@id": "dcterms:isVersionOf", "@type": "@id"},
+    "language": {"@id": "dcterms:language"},
+    "rights": {"@id": "dcterms:rights"},
+    "provenance": {"@id": "dcterms:provenance"},
+    "spatial": {"@id": "dcterms:spatial"},
+    "temporal": {"@id": "dcterms:temporal"},
+
+    "keyword": {"@id": "dcat:keyword", "@container": "@set"},
+    "theme": {"@id": "dcat:theme"},
+    "distribution": {"@id": "dcat:distribution", "@container": "@set"},
+    "dataset": {"@id": "dcat:dataset", "@container": "@set"},
+    "accessURL": {"@id": "dcat:accessURL", "@type": "@id"},
+    "downloadURL": {"@id": "dcat:downloadURL", "@type": "@id"},
+    "mediaType": {"@id": "dcat:mediaType"},
+    "byteSize": {"@id": "dcat:byteSize", "@type": "xsd:decimal"},
+    "accessService": {"@id": "dcat:accessService", "@type": "@id"},
+    "endpointURL": {"@id": "dcat:endpointURL", "@type": "@id"},
+
+    "checksum": {"@id": "spdx:checksum"},
+    "checksumValue": {"@id": "spdx:checksumValue"},
+    "checksumAlgorithm": {"@id": "spdx:checksumAlgorithm", "@type": "@id"},
+
+    "assumptions": {"@id": "app:assumptions"},
+    "technique": {"@id": "app:technique"},
+    "postProcessing": {"@id": "app:postProcessing"}
+  }
+}

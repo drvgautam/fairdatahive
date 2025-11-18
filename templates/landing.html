@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="{{ version.language or 'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ version.title }} — FairDataHive</title>
+    <meta name="description" content="{{ version.description[:160] }}">
+    <meta name="robots" content="index,follow">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+               max-width: 960px; margin: 2rem auto; padding: 0 1.5rem; color: #1a1a1a; }
+        h1 { margin: 0; font-size: 1.8rem; }
+        .meta { color: #555; margin-bottom: 1.5rem; }
+        .panel { border: 1px solid #e2e2e2; border-radius: 6px; padding: 1rem 1.25rem;
+                 margin-bottom: 1.5rem; background: #fafafa; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid #eaeaea; vertical-align: top; }
+        th { width: 30%; color: #444; font-weight: 600; }
+        .keywords span { background: #eef; border-radius: 999px; padding: 2px 10px; margin-right: 6px;
+                         font-size: 0.85rem; display: inline-block; margin-bottom: 4px; }
+        .download { display: inline-block; padding: 0.6rem 1.2rem; background: #2563eb; color: white;
+                    border-radius: 6px; text-decoration: none; margin-right: 0.5rem; }
+        .download.secondary { background: #475569; }
+        .fair-bar { background: #eaeaea; height: 14px; border-radius: 7px; overflow: hidden; }
+        .fair-bar > span { display: block; height: 100%;
+                           background: linear-gradient(90deg, #16a34a, #65a30d); }
+        .deleted { background: #fee2e2; color: #991b1b; padding: 0.5rem 0.75rem; border-radius: 6px; margin-bottom: 1rem; }
+        .versions li { margin-bottom: 4px; }
+        code { background: #f1f5f9; padding: 2px 5px; border-radius: 4px; font-size: 0.9rem; }
+    </style>
+    <script type="application/ld+json">
+        {{ jsonld | safe }}
+    </script>
+</head>
+<body>
+    {% if version.data_deleted %}
+    <div class="deleted">This resource has been deleted. Metadata is retained but the data is no longer available.</div>
+    {% endif %}
+
+    <h1>{{ version.title }}</h1>
+    <div class="meta">
+        State: <strong>{{ version.state }}</strong>
+        &middot; Theme: {{ version.theme or "—" }}
+        &middot; Issued: {{ version.issued.strftime('%Y-%m-%d') if version.issued else "—" }}
+        &middot; License: <code>{{ version.license_id or "unset" }}</code>
+    </div>
+
+    <div class="panel">
+        <p>{{ version.description }}</p>
+        {% if version.keywords %}
+        <div class="keywords">
+            {% for kw in version.keywords %}<span>{{ kw }}</span>{% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <h2 style="margin-top:0">FAIR completeness</h2>
+        <div class="fair-bar"><span style="width: {{ (fair.score * 100) | round(1) }}%"></span></div>
+        <p>Overall score: <strong>{{ (fair.score * 100) | round(1) }}%</strong></p>
+        <table>
+            {% for name, dim in fair.dimensions.items() %}
+            <tr>
+                <th style="text-transform: capitalize">{{ name }}</th>
+                <td>{{ (dim.score * 100) | round(0) }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2 style="margin-top:0">Metadata</h2>
+        <table>
+            <tr><th>Identifier</th><td><code>{{ version.id }}</code></td></tr>
+            <tr><th>Base resource</th><td><code>{{ version.base_resource_id }}</code></td></tr>
+            <tr><th>Publisher</th><td>{{ version.publisher_sub }}</td></tr>
+            <tr><th>DOI</th><td>{{ version.doi or "—" }}</td></tr>
+            <tr><th>Language</th><td>{{ version.language or "—" }}</td></tr>
+            <tr><th>Provenance</th><td>{{ version.provenance or "—" }}</td></tr>
+            <tr><th>Rights statement</th><td>{{ version.rights_statement or "—" }}</td></tr>
+            <tr><th>Spatial</th><td>{{ version.spatial or "—" }}</td></tr>
+            <tr><th>Temporal</th><td>{{ version.temporal or "—" }}</td></tr>
+            <tr><th>Assumptions</th><td>{{ version.assumptions or "—" }}</td></tr>
+            <tr><th>Technique</th><td>{{ version.technique or "—" }}</td></tr>
+            <tr><th>Post-processing</th><td>{{ version.post_processing or "—" }}</td></tr>
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2 style="margin-top:0">Distributions</h2>
+        <table>
+            <tr><th>Title</th><th>Media type</th><th>Size</th><th>Action</th></tr>
+            {% for ds in version.datasets %}
+            {% for dist in ds.distributions %}
+            <tr>
+                <td>{{ dist.title or dist.id }}</td>
+                <td><code>{{ dist.media_type or "—" }}</code></td>
+                <td>{{ dist.byte_size or "—" }}</td>
+                <td>
+                    {% if not version.data_deleted and dist.download_url %}
+                    <a class="download" href="/api/v1/distributions/{{ dist.id }}/download">Download</a>
+                    {% elif dist.access_url %}
+                    <a class="download secondary" href="{{ dist.access_url }}">External link</a>
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2 style="margin-top:0">Machine-readable</h2>
+        <a class="download secondary" href="/api/v1/resources/{{ version.id }}.ttl">Turtle</a>
+        <a class="download secondary" href="/api/v1/resources/{{ version.id }}.jsonld">JSON-LD</a>
+        <a class="download secondary" href="/api/v1/resources/{{ version.id }}/fair-score">FAIR score (JSON)</a>
+    </div>
+
+    <div class="panel">
+        <h2 style="margin-top:0">Version history</h2>
+        <ul class="versions">
+        {% for v in versions %}
+            <li>
+                <a href="/api/v1/resources/{{ v.id }}/landing">{{ v.id }}</a>
+                — {{ v.state }} — {{ v.issued.strftime('%Y-%m-%d') if v.issued else "—" }}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
