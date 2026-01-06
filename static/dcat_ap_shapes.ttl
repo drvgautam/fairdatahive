@@ -1,0 +1,55 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix app: <https://fairdatahive.io/vocab#> .
+
+# Minimal DCAT-AP 3 shapes — bundled subset for in-process validation.
+# Real deployments may replace this with the upstream shapes from
+# https://github.com/SEMICeu/DCAT-AP
+
+app:ResourceShape
+    a sh:NodeShape ;
+    sh:targetClass dcat:Resource ;
+    sh:property [
+        sh:path dcterms:title ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:severity sh:Violation ;
+        sh:message "A resource must have at least one dcterms:title."
+    ] ;
+    sh:property [
+        sh:path dcterms:description ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Resources should have a dcterms:description."
+    ] ;
+    sh:property [
+        sh:path dcterms:publisher ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Resources should declare a publisher."
+    ] ;
+    sh:property [
+        sh:path dcterms:license ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Resources should declare a license."
+    ] ;
+    sh:property [
+        sh:path dcat:distribution ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Resources should have at least one distribution."
+    ] .
+
+app:DistributionShape
+    a sh:NodeShape ;
+    sh:targetClass dcat:Distribution ;
+    sh:property [
+        sh:path dcat:mediaType ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Distributions should declare a dcat:mediaType."
+    ] .
