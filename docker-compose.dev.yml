@@ -1,0 +1,54 @@
+# Dev overrides: API hot reload + bind-mounted source (no image rebuild per Python change)
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# Vite UI (recommended): cd frontend && npm run dev  →  http://localhost:5173
+
+services:
+  migrate:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://fairdatahive:fairdatahive@postgres:5432/fairdatahive
+      RUN_MIGRATIONS: "true"
+    entrypoint: ["/app/docker/entrypoint.sh"]
+    command: ["true"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./app:/app/app
+      - ./docs:/app/docs
+      - ./static:/app/static
+      - ./templates:/app/templates
+      - ./alembic:/app/alembic
+      - ./frontend/dist:/app/frontend/dist
+      - hf-cache:/root/.cache/huggingface
+    environment:
+      RUN_MIGRATIONS: "false"
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8000"
+      - --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      redis:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  hf-cache:
