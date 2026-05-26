@@ -115,7 +115,7 @@ export const api = {
   },
 
   getResource: (versionId: string) =>
-    request<ResourceVersion>(`/resources/${versionId}`, {}, false),
+    request<ResourceVersion>(`/resources/${versionId}`),
 
   listVersions: (baseId: string) =>
     request<ResourceVersionSummary[]>(`/resources/${baseId}/versions`, {}, false),

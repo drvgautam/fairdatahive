@@ -763,6 +763,21 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.btn-sm {
+  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.my-resource-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.my-resource-row .resource-card {
+  flex: 1;
+}
+
 .fair-panel {
   background: var(--surface);
   border: 1px solid var(--border);

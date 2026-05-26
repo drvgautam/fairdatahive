@@ -94,10 +94,11 @@ export function ResourcePage() {
     }
   }
 
-  const isOwner =
-    Boolean(token) &&
-    Boolean(profile?.sub) &&
-    profile?.sub === resource?.publisher_sub;
+  const canManage =
+    resource?.can_manage === true ||
+    (Boolean(token) &&
+      Boolean(profile?.sub) &&
+      profile?.sub === resource?.publisher_sub);
 
   async function deleteResource() {
     if (!resource?.base_resource_id) return;
@@ -209,7 +210,7 @@ export function ResourcePage() {
             </nav>
           </section>
 
-          {isOwner && !resource.data_deleted && (
+          {canManage && !resource.data_deleted && (
             <section className="resource-actions">
               {resource.state === "draft" && (
                 <button type="button" onClick={publish} disabled={busy}>

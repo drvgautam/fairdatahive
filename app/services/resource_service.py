@@ -80,6 +80,21 @@ async def get_resource(db: AsyncSession, resource_id: str) -> Resource:
     return res
 
 
+async def version_to_read(
+    db: AsyncSession,
+    version: ResourceVersion,
+    user_sub: str | None,
+) -> "ResourceVersionRead":
+    from app.schemas.resource import ResourceVersionRead
+
+    resource = await get_resource(db, version.base_resource_id)
+    can_manage = user_sub is not None and resource.owner_sub == user_sub
+    read = ResourceVersionRead.model_validate(version)
+    return read.model_copy(
+        update={"scope": resource.scope, "can_manage": can_manage},
+    )
+
+
 async def resolve_base_resource_id(
     db: AsyncSession, resource_or_version_id: str
 ) -> str:

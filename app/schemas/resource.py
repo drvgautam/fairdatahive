@@ -96,6 +96,8 @@ class ResourceVersionRead(BaseModel):
     data_deleted: bool = False
     dcat_ap_report: str | None = None
     download_count: int = 0
+    scope: str | None = None
+    can_manage: bool = False
     datasets: list[DatasetRead] = Field(default_factory=list)
 
 

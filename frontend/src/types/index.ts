@@ -36,6 +36,7 @@ export interface Dataset {
 }
 
 export interface ResourceVersion extends ResourceVersionSummary {
+  can_manage?: boolean;
   language: string | null;
   provenance: string | null;
   rights_statement: string | null;

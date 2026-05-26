@@ -233,6 +233,15 @@ async def test_delete_resource_hidden_from_my_resources(client):
     assert not any(r["base_resource_id"] == base for r in mine_after.json())
 
 
+async def test_get_resource_includes_can_manage_for_owner(client):
+    create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
+    body = create.json()
+    resp = await client.get(f"/api/v1/resources/{body['id']}")
+    assert resp.status_code == 200
+    assert resp.json()["can_manage"] is True
+    assert resp.json()["scope"] == "public"
+
+
 async def test_delete_draft_version(client):
     create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
     body = create.json()
