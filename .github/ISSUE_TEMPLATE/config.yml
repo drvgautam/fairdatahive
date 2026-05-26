@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/drvgautam/fairdatahive/security/advisories/new
     about: Report a vulnerability privately (see SECURITY.md).
   - name: Documentation
-    url: https://github.com/drvgautam/fairdatahive/blob/main/docs/index.html
+    url: https://drvgautam.github.io/fairdatahive/
     about: Project guide, API reference, and deployment notes.
