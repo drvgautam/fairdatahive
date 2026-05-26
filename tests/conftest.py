@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import AsyncIterator
 
 # Force testing mode before anything else loads settings
-os.environ.setdefault("TESTING", "true")
+os.environ["TESTING"] = "true"
+os.environ["DEV_AUTH_ENABLED"] = "false"
 os.environ.setdefault(
     "DATABASE_URL", "sqlite+aiosqlite:///:memory:"
 )
@@ -44,6 +45,12 @@ def pytest_configure(config) -> None:
 
 @pytest_asyncio.fixture
 async def engine():
+    import app.models  # noqa: F401 — register ORM tables on Base.metadata
+
+    from app.config import get_settings
+
+    get_settings.cache_clear()
+
     eng = create_async_engine(
         "sqlite+aiosqlite:///:memory:",
         connect_args={"check_same_thread": False},

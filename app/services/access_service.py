@@ -17,6 +17,7 @@ from app.database import get_session_factory
 from app.models.access import AccessRequest
 from app.models.resource import ResourceVersion
 from app.services import notification_service
+from app.core.resource_access import get_version_if_viewable
 from app.services.resource_service import get_version
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,9 @@ def _now() -> datetime:
 async def get_access_status(
     db: AsyncSession, version_id: str, user_sub: str | None
 ) -> dict:
-    version = await get_version(db, version_id, with_datasets=False)
+    version = await get_version_if_viewable(
+        db, version_id, user_sub, with_datasets=False
+    )
     is_owner = user_sub is not None and version.publisher_sub == user_sub
     has_access = (
         not version.is_private

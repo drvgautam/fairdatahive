@@ -7,10 +7,10 @@ from pathlib import Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from app.core.dependencies import get_db
+from app.core.dependencies import CurrentUser, get_db, get_optional_user
+from app.core.resource_access import get_version_if_viewable, list_versions_if_viewable
 from app.services.fair_service import compute_fair_score
 from app.services.rdf_service import to_jsonld, to_turtle, version_to_graph
-from app.services import resource_service
 
 router = APIRouter(prefix="/resources", tags=["rdf"])
 
@@ -18,15 +18,27 @@ _TEMPLATES = Jinja2Templates(directory=str(Path(__file__).resolve().parents[2] /
 
 
 @router.get("/{version_id}.ttl")
-async def version_ttl(version_id: str, db: AsyncSession = Depends(get_db)):
-    version = await resource_service.get_version(db, version_id)
+async def version_ttl(
+    version_id: str,
+    user: CurrentUser | None = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db),
+):
+    version = await get_version_if_viewable(
+        db, version_id, user.sub if user else None
+    )
     graph = await version_to_graph(db, version)
     return Response(to_turtle(graph), media_type="text/turtle")
 
 
 @router.get("/{version_id}.jsonld")
-async def version_jsonld(version_id: str, db: AsyncSession = Depends(get_db)):
-    version = await resource_service.get_version(db, version_id)
+async def version_jsonld(
+    version_id: str,
+    user: CurrentUser | None = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db),
+):
+    version = await get_version_if_viewable(
+        db, version_id, user.sub if user else None
+    )
     graph = await version_to_graph(db, version)
     return Response(to_jsonld(graph), media_type="application/ld+json")
 
@@ -35,13 +47,15 @@ async def version_jsonld(version_id: str, db: AsyncSession = Depends(get_db)):
 async def landing_page(
     version_id: str,
     request: Request,
+    user: CurrentUser | None = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
-    version = await resource_service.get_version(db, version_id)
+    sub = user.sub if user else None
+    version = await get_version_if_viewable(db, version_id, sub)
     graph = await version_to_graph(db, version)
     jsonld = to_jsonld(graph)
     fair = await compute_fair_score(db, version)
-    versions = await resource_service.list_versions(db, version.base_resource_id)
+    versions = await list_versions_if_viewable(db, version.base_resource_id, sub)
     return _TEMPLATES.TemplateResponse(
         "landing.html",
         {

@@ -3,7 +3,13 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.dependencies import CurrentUser, get_current_user, get_db
+from app.core.dependencies import (
+    CurrentUser,
+    get_current_user,
+    get_db,
+    get_optional_user,
+)
+from app.core.resource_access import get_version_if_viewable
 from app.core.exceptions import ForbiddenError
 from app.services import datacite_service, resource_service
 from app.services.rdf_service import version_to_graph
@@ -14,9 +20,13 @@ router = APIRouter(prefix="/resources", tags=["interop"])
 
 @router.get("/{version_id}/dcat-ap-report")
 async def dcat_ap_report(
-    version_id: str, db: AsyncSession = Depends(get_db)
+    version_id: str,
+    user: CurrentUser | None = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db),
 ) -> Response:
-    version = await resource_service.get_version(db, version_id)
+    version = await get_version_if_viewable(
+        db, version_id, user.sub if user else None
+    )
     if version.dcat_ap_report:
         return Response(version.dcat_ap_report, media_type="text/turtle")
     graph = await version_to_graph(db, version)

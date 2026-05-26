@@ -10,6 +10,10 @@ from app.core.dependencies import (
     get_db,
     get_optional_user,
 )
+from app.core.resource_access import (
+    get_version_if_viewable,
+    list_versions_if_viewable,
+)
 from app.core.exceptions import GoneError
 from app.core.pagination import PageParams, get_page_params
 from app.schemas.fair import FairScore
@@ -63,15 +67,26 @@ async def list_resources(
     response_model=list[ResourceVersionSummary],
 )
 async def list_versions(
-    base_id: str, db: AsyncSession = Depends(get_db)
+    base_id: str,
+    user: CurrentUser | None = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    versions = await resource_service.list_versions(db, base_id)
+    versions = await list_versions_if_viewable(
+        db, base_id, user.sub if user else None
+    )
     return [ResourceVersionSummary.model_validate(v) for v in versions]
 
 
 @router.get("/{base_id}/latest")
-async def get_latest(base_id: str, db: AsyncSession = Depends(get_db)):
-    version = await resource_service.get_latest(db, base_id)
+async def get_latest(
+    base_id: str,
+    user: CurrentUser | None = Depends(get_optional_user),
+    db: AsyncSession = Depends(get_db),
+):
+    latest = await resource_service.get_latest(db, base_id)
+    version = await get_version_if_viewable(
+        db, latest.id, user.sub if user else None
+    )
     return RedirectResponse(
         url=f"/api/v1/resources/{version.id}",
         status_code=status.HTTP_307_TEMPORARY_REDIRECT,
@@ -92,9 +107,12 @@ async def delete_resource(
 async def get_version(
     version_id: str,
     request: Request,
+    user: CurrentUser | None = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
-    version = await resource_service.get_version(db, version_id)
+    version = await get_version_if_viewable(
+        db, version_id, user.sub if user else None
+    )
     if version.data_deleted:
         body = ResourceVersionRead.model_validate(version).model_dump(mode="json")
         raise GoneError(
@@ -174,7 +192,10 @@ async def delete_version(
 @router.get("/{version_id}/fair-score", response_model=FairScore)
 async def fair_score(
     version_id: str,
+    user: CurrentUser | None = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
-    version = await resource_service.get_version(db, version_id)
+    version = await get_version_if_viewable(
+        db, version_id, user.sub if user else None
+    )
     return await compute_fair_score(db, version)
