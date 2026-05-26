@@ -114,7 +114,11 @@ async def get_version(
         db, version_id, user.sub if user else None
     )
     if version.data_deleted:
-        body = ResourceVersionRead.model_validate(version).model_dump(mode="json")
+        body = (
+            await resource_service.version_to_read(
+                db, version, user.sub if user else None
+            )
+        ).model_dump(mode="json")
         raise GoneError(
             "This resource has been deleted; only metadata remains.",
             error_code="resource_deleted",
@@ -129,7 +133,9 @@ async def get_version(
         graph = await version_to_graph(db, version)
         return Response(to_jsonld(graph), media_type="application/ld+json")
 
-    return version
+    return await resource_service.version_to_read(
+        db, version, user.sub if user else None
+    )
 
 
 @router.patch("/{version_id}", response_model=ResourceVersionRead)

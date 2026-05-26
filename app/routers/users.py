@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import CurrentUser, get_current_user, get_db
 from app.core.exceptions import NotFoundError
-from app.models.resource import Resource, ResourceVersion
+from app.models.resource import ResourceVersion
 from app.models.user import UserProfile
 from app.schemas.resource import ResourceVersionSummary
 from app.schemas.user import UserProfileRead, UserProfileUpdate
+from app.services import resource_service
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -57,13 +57,7 @@ async def list_my_resources(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[ResourceVersion]:
-    stmt = (
-        select(ResourceVersion)
-        .join(Resource, Resource.id == ResourceVersion.base_resource_id)
-        .where(Resource.owner_sub == user.sub)
-        .order_by(ResourceVersion.issued.desc())
-    )
-    return list((await db.execute(stmt)).scalars().all())
+    return await resource_service.list_owned_versions(db, user.sub)
 
 
 @router.get("/{sub}", response_model=UserProfileRead)

@@ -209,6 +209,51 @@ async def test_delete_resource_creates_tombstone(client):
     assert tombstone["data_deleted"] is True
 
 
+async def test_delete_resource_accepts_version_id(client):
+    create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
+    body = create.json()
+    await client.post(f"/api/v1/resources/{body['id']}/publish")
+
+    deleted = await client.delete(f"/api/v1/resources/{body['id']}")
+    assert deleted.status_code == 204
+
+
+async def test_delete_resource_hidden_from_my_resources(client):
+    create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
+    body = create.json()
+    base = body["base_resource_id"]
+    await client.post(f"/api/v1/resources/{body['id']}/publish")
+
+    mine_before = await client.get("/api/v1/users/me/resources")
+    assert any(r["base_resource_id"] == base for r in mine_before.json())
+
+    await client.delete(f"/api/v1/resources/{base}")
+
+    mine_after = await client.get("/api/v1/users/me/resources")
+    assert not any(r["base_resource_id"] == base for r in mine_after.json())
+
+
+async def test_get_resource_includes_can_manage_for_owner(client):
+    create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
+    body = create.json()
+    resp = await client.get(f"/api/v1/resources/{body['id']}")
+    assert resp.status_code == 200
+    assert resp.json()["can_manage"] is True
+    assert resp.json()["scope"] == "public"
+
+
+async def test_delete_draft_version(client):
+    create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
+    body = create.json()
+    version_id = body["id"]
+
+    deleted = await client.delete(f"/api/v1/resources/{version_id}/version")
+    assert deleted.status_code == 204
+
+    get_resp = await client.get(f"/api/v1/resources/{version_id}")
+    assert get_resp.status_code == 404
+
+
 async def test_unknown_resource_returns_404(client):
     resp = await client.get("/api/v1/resources/resource-does-not-exist")
     assert resp.status_code == 404

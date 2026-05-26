@@ -96,6 +96,8 @@ class ResourceVersionRead(BaseModel):
     data_deleted: bool = False
     dcat_ap_report: str | None = None
     download_count: int = 0
+    scope: str | None = None
+    can_manage: bool = False
     datasets: list[DatasetRead] = Field(default_factory=list)
 
 
@@ -113,6 +115,7 @@ class ResourceVersionSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
+    base_resource_id: str
     title: str
     state: str
     issued: datetime
@@ -120,6 +123,8 @@ class ResourceVersionSummary(BaseModel):
     publisher_sub: str
     theme: str | None = None
     license_id: str | None = None
+    is_private: bool = False
+    data_deleted: bool = False
 
 
 class NewVersionRequest(BaseModel):

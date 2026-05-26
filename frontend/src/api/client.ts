@@ -67,7 +67,7 @@ async function request<T>(
   if (!res.ok) {
     const err = body as { detail?: string; message?: string };
     const msg =
-      err?.detail || err?.message || `Request failed (${res.status})`;
+      err?.message || err?.detail || `Request failed (${res.status})`;
     throw new ApiClientError(msg, res.status, body);
   }
 
@@ -115,7 +115,7 @@ export const api = {
   },
 
   getResource: (versionId: string) =>
-    request<ResourceVersion>(`/resources/${versionId}`, {}, false),
+    request<ResourceVersion>(`/resources/${versionId}`),
 
   listVersions: (baseId: string) =>
     request<ResourceVersionSummary[]>(`/resources/${baseId}/versions`, {}, false),
@@ -139,6 +139,9 @@ export const api = {
 
   deleteResource: (baseId: string) =>
     request<void>(`/resources/${baseId}`, { method: "DELETE" }),
+
+  deleteVersion: (versionId: string) =>
+    request<void>(`/resources/${versionId}/version`, { method: "DELETE" }),
 
   fairScore: (versionId: string) =>
     request<FairScore>(`/resources/${versionId}/fair-score`, {}, false),

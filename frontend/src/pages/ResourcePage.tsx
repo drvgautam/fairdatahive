@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/client";
 import { FairScorePanel } from "../components/FairScorePanel";
 import { useAuth } from "../context/AuthContext";
@@ -12,7 +12,8 @@ import type {
 
 export function ResourcePage() {
   const { versionId } = useParams<{ versionId: string }>();
-  const { token } = useAuth();
+  const navigate = useNavigate();
+  const { token, profile } = useAuth();
   const [resource, setResource] = useState<ResourceVersion | null>(null);
   const [versions, setVersions] = useState<ResourceVersionSummary[]>([]);
   const [fair, setFair] = useState<FairScore | null>(null);
@@ -90,6 +91,36 @@ export function ResourcePage() {
       window.open(download_url, "_blank");
     } catch (e) {
       setActionMsg(e instanceof Error ? e.message : "Download failed");
+    }
+  }
+
+  const canManage =
+    resource?.can_manage === true ||
+    (Boolean(token) &&
+      Boolean(profile?.sub) &&
+      profile?.sub === resource?.publisher_sub);
+
+  async function deleteResource() {
+    if (!resource?.base_resource_id) return;
+    const label =
+      resource.state === "draft"
+        ? "Delete this draft permanently?"
+        : "Delete this resource? Metadata will be kept as a tombstone; files will be removed from storage.";
+    if (!window.confirm(label)) return;
+
+    setBusy(true);
+    setActionMsg(null);
+    try {
+      if (resource.state === "draft") {
+        await api.deleteVersion(resource.id);
+      } else {
+        await api.deleteResource(resource.base_resource_id);
+      }
+      navigate("/my", { replace: true });
+    } catch (e) {
+      setActionMsg(e instanceof Error ? e.message : "Delete failed");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -179,11 +210,26 @@ export function ResourcePage() {
             </nav>
           </section>
 
-          {resource.state === "draft" && token && (
+          {canManage && !resource.data_deleted && (
             <section className="resource-actions">
-              <button type="button" onClick={publish} disabled={busy}>
-                Publish
+              {resource.state === "draft" && (
+                <button type="button" onClick={publish} disabled={busy}>
+                  Publish
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn-danger"
+                onClick={deleteResource}
+                disabled={busy}
+              >
+                {resource.state === "draft" ? "Delete draft" : "Delete resource"}
               </button>
+            </section>
+          )}
+          {resource.data_deleted && (
+            <section className="alert alert-error">
+              This resource has been deleted. Only metadata is retained.
             </section>
           )}
         </div>

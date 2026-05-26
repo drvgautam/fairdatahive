@@ -80,6 +80,32 @@ async def get_resource(db: AsyncSession, resource_id: str) -> Resource:
     return res
 
 
+async def version_to_read(
+    db: AsyncSession,
+    version: ResourceVersion,
+    user_sub: str | None,
+) -> "ResourceVersionRead":
+    from app.schemas.resource import ResourceVersionRead
+
+    resource = await get_resource(db, version.base_resource_id)
+    can_manage = user_sub is not None and resource.owner_sub == user_sub
+    read = ResourceVersionRead.model_validate(version)
+    return read.model_copy(
+        update={"scope": resource.scope, "can_manage": can_manage},
+    )
+
+
+async def resolve_base_resource_id(
+    db: AsyncSession, resource_or_version_id: str
+) -> str:
+    """Accept a base resource id or a version id (…-v-…)."""
+    resource = await db.get(Resource, resource_or_version_id)
+    if resource is not None:
+        return resource.id
+    version = await get_version(db, resource_or_version_id, with_datasets=False)
+    return version.base_resource_id
+
+
 async def get_version(
     db: AsyncSession, version_id: str, *, with_datasets: bool = True
 ) -> ResourceVersion:
@@ -481,14 +507,65 @@ async def delete_version(
 async def delete_resource(
     db: AsyncSession, base_id: str, user_sub: str
 ) -> None:
-    resource = await get_resource(db, base_id)
+    resolved_base_id = await resolve_base_resource_id(db, base_id)
+    resource = await get_resource(db, resolved_base_id)
     if resource.owner_sub != user_sub:
         raise ForbiddenError("Only the resource owner may delete this resource.")
 
-    stmt = select(ResourceVersion).where(ResourceVersion.base_resource_id == base_id)
+    stmt = select(ResourceVersion).where(
+        ResourceVersion.base_resource_id == resolved_base_id
+    )
     versions = list((await db.execute(stmt)).scalars().all())
     await _tombstone_versions(db, versions)
+    resource.current_version_id = None
+
+    try:
+        from app.services import cache_service
+
+        await cache_service.invalidate_scope(resource.scope)
+    except Exception as exc:  # pragma: no cover - cache is best-effort
+        logger.debug("Cache invalidation failed: %s", exc)
+
     await db.commit()
+
+
+async def list_owned_versions(
+    db: AsyncSession, user_sub: str
+) -> list[ResourceVersion]:
+    """One display row per owned resource; omit fully tombstoned resources."""
+    stmt = (
+        select(ResourceVersion)
+        .join(Resource, Resource.id == ResourceVersion.base_resource_id)
+        .where(Resource.owner_sub == user_sub)
+        .order_by(ResourceVersion.issued.desc())
+    )
+    all_versions = list((await db.execute(stmt)).scalars().all())
+    by_base: dict[str, list[ResourceVersion]] = {}
+    for version in all_versions:
+        by_base.setdefault(version.base_resource_id, []).append(version)
+
+    display: list[ResourceVersion] = []
+    for base_id, versions in by_base.items():
+        if all(v.data_deleted for v in versions):
+            continue
+        resource = await get_resource(db, base_id)
+        pick: ResourceVersion | None = None
+        if resource.current_version_id:
+            pick = next(
+                (v for v in versions if v.id == resource.current_version_id),
+                None,
+            )
+            if pick is not None and pick.data_deleted:
+                pick = None
+        if pick is None:
+            active = [v for v in versions if not v.data_deleted]
+            if not active:
+                continue
+            pick = active[0]
+        display.append(pick)
+
+    display.sort(key=lambda v: v.modified, reverse=True)
+    return display
 
 
 async def _tombstone_versions(
