@@ -50,6 +50,11 @@ async def _purge_loop() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if settings.dev_auth_enabled:
+        logger.warning(
+            "DEV_AUTH_ENABLED is true: all API requests run as the dev user. "
+            "Disable before any production deployment."
+        )
     if not settings.testing:
         task = asyncio.create_task(_purge_loop())
         _background_tasks.add(task)
