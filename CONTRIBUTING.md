@@ -35,7 +35,7 @@ Clone and work in **one** directory (your fork or `~/Documents/fairdatahive`). D
    ```
    Open http://localhost:5173 (API on http://localhost:8002).
 
-See [README.md](README.md) for troubleshooting.
+See [README.md](README.md) for troubleshooting. Full project guide: **https://drvgautam.github.io/fairdatahive/** (or http://localhost:8002/docs when the stack is running).
 
 ## Branch and pull request workflow
 
