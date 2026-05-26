@@ -29,7 +29,8 @@ FairDataHive ships with **development defaults** that must be changed before any
 | `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` | `minioadmin` | Rotated credentials |
 | `CORS_ORIGINS` | Local dev URLs | Explicit production UI origins only |
 | Keycloak admin | Default in compose profile | Secured realm, no public admin console |
-| `/metrics` | Exposed on API | Restrict to monitoring network |
+| `ENABLE_OPENAPI` / `ENABLE_METRICS` | `true` for local dev | Set **`false`** on public APIs unless behind VPN |
+| `/metrics` | Exposed on API when `ENABLE_METRICS=true` | Disable or restrict to monitoring network |
 | MinIO console (port 9003) | Local access | VPN or disabled publicly |
 
 Never commit `.env` files or real API keys to the repository.

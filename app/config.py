@@ -63,6 +63,9 @@ class Settings(BaseSettings):
     cors_origins: str = Field(
         default="http://localhost:5173,http://localhost:3000,http://localhost:8001"
     )
+    enable_openapi: bool = Field(default=True)
+    enable_metrics: bool = Field(default=True)
+
     dev_auth_enabled: bool = Field(default=False)
     dev_auth_sub: str = Field(default="dev-user")
     dev_auth_name: str = Field(default="Development User")

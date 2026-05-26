@@ -85,8 +85,8 @@ def create_app() -> FastAPI:
             "PostgreSQL + pgvector + MinIO."
         ),
         lifespan=lifespan,
-        docs_url="/swagger",
-        redoc_url="/redoc",
+        docs_url="/swagger" if settings.enable_openapi else None,
+        redoc_url="/redoc" if settings.enable_openapi else None,
     )
 
     register_exception_handlers(app)
@@ -151,14 +151,15 @@ def create_app() -> FastAPI:
             "base_url": settings.base_url,
         }
 
-    try:
-        from prometheus_fastapi_instrumentator import Instrumentator
+    if settings.enable_metrics:
+        try:
+            from prometheus_fastapi_instrumentator import Instrumentator
 
-        Instrumentator().instrument(app).expose(
-            app, endpoint="/metrics", include_in_schema=False
-        )
-    except Exception as exc:  # pragma: no cover - metrics are optional
-        logger.debug("Prometheus instrumentation unavailable: %s", exc)
+            Instrumentator().instrument(app).expose(
+                app, endpoint="/metrics", include_in_schema=False
+            )
+        except Exception as exc:  # pragma: no cover - metrics are optional
+            logger.debug("Prometheus instrumentation unavailable: %s", exc)
 
     return app
 
