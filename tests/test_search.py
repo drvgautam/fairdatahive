@@ -58,6 +58,7 @@ async def _publish_with_keywords(client, keywords: list[str]):
 async def test_keyword_search_matches_short_keywords(client):
     await _publish_with_keywords(client, ["a", "b", "c", "d"])
     await _publish_with_keywords(client, ["x", "y"])
+    await _publish_with_keywords(client, ["fairdata", "hive"])
 
     abcd_title = "Dataset without keyword letters in title"
     for query in ("a,b,c,d", "a b c d", "a"):
@@ -68,6 +69,8 @@ async def test_keyword_search_matches_short_keywords(client):
         assert any(abcd_title in t for t in titles), (
             f"expected abcd dataset for query {query!r}, got {titles!r}"
         )
+        if query == "a":
+            assert len(titles) == 1, f"'a' should not match fairdata, got {titles!r}"
 
 
 async def test_keyword_search_matches_stored_keyword_terms(client):

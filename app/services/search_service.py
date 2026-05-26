@@ -4,7 +4,7 @@ import logging
 import re
 from typing import Literal
 
-from sqlalchemy import String, and_, case, cast, func, literal, or_, select
+from sqlalchemy import String, and_, case, cast, exists, func, literal, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -78,15 +78,29 @@ def _fts_vector(dialect: str):
 
 
 def _short_token(token: str) -> bool:
-    """Single-letter terms are English FTS stop words and match prose via ILIKE."""
+    """Single-letter terms are English FTS stop words; match keywords exactly."""
     return len(token) <= 2
 
 
+def _postgres_keyword_element_equals(token: str):
+    """True when `keywords` contains an element equal to token (case-insensitive)."""
+    kw_elem = func.unnest(ResourceVersion.keywords).column_valued("kw")
+    return exists(
+        select(literal(1))
+        .where(func.lower(kw_elem) == token.lower())
+        .correlate(ResourceVersion)
+    )
+
+
 def _ilike_token_match(token: str, *, dialect: str):
-    pattern = f"%{token.lower()}%"
+    lowered = token.lower()
+    pattern = f"%{lowered}%"
     kw_text = func.lower(_keywords_as_text(dialect))
+    if dialect == "postgresql" and _short_token(token):
+        return _postgres_keyword_element_equals(token)
     if _short_token(token):
-        return kw_text.like(pattern)
+        # JSON keyword list in SQLite tests: match a quoted array element only.
+        return cast(ResourceVersion.keywords, String).like(f'%"{token}"%')
     return or_(
         func.lower(ResourceVersion.title).like(pattern),
         func.lower(ResourceVersion.description).like(pattern),
