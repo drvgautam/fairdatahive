@@ -5,6 +5,7 @@ import hashlib
 import io
 import logging
 import mimetypes
+import os
 import uuid
 import zipfile
 from dataclasses import dataclass
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 _CHUNK_SIZE = 1024 * 1024  # 1 MiB
 _PART_SIZE = 5 * 1024 * 1024  # 5 MiB for multipart uploads
+_MAX_ZIP_MEMBERS = 200
 
 
 @dataclass
@@ -86,7 +88,9 @@ class MinioService:
     def make_object_key(
         scope: str, resource_id: str, filename: str
     ) -> str:
-        clean_name = filename.replace("..", "_").lstrip("/")
+        clean_name = os.path.basename(filename.replace("\\", "/")).lstrip("/")
+        if not clean_name or clean_name in (".", ".."):
+            clean_name = "upload.bin"
         return f"{scope}/{resource_id}/{uuid.uuid4().hex[:8]}-{clean_name}"
 
     async def upload_stream(
@@ -203,14 +207,44 @@ def _is_zip(data: bytes, filename: str) -> bool:
     return data[:4] == b"PK\x03\x04"
 
 
+def _safe_zip_member_name(raw: str) -> str:
+    normalized = raw.replace("\\", "/")
+    if normalized.startswith("/") or ".." in normalized.split("/"):
+        raise ValidationError(
+            "ZIP entry path is not allowed.",
+            error_code="zip_invalid_path",
+        )
+    base = os.path.basename(normalized)
+    if not base or base in (".", ".."):
+        raise ValidationError(
+            "ZIP entry path is not allowed.",
+            error_code="zip_invalid_path",
+        )
+    return base
+
+
 def _extract_zip_sync(data: bytes) -> list[tuple[str, bytes]]:
+    max_uncompressed = settings.max_upload_size_mb * 1024 * 1024
     out: list[tuple[str, bytes]] = []
+    total_uncompressed = 0
     with zipfile.ZipFile(io.BytesIO(data)) as zf:
-        for info in zf.infolist():
-            if info.is_dir():
-                continue
+        file_infos = [i for i in zf.infolist() if not i.is_dir()]
+        if len(file_infos) > _MAX_ZIP_MEMBERS:
+            raise ValidationError(
+                f"ZIP archive exceeds {_MAX_ZIP_MEMBERS} file limit.",
+                error_code="zip_too_many_files",
+            )
+        for info in file_infos:
+            safe_name = _safe_zip_member_name(info.filename)
             with zf.open(info, "r") as fh:
-                out.append((info.filename, fh.read()))
+                member_data = fh.read()
+            total_uncompressed += len(member_data)
+            if total_uncompressed > max_uncompressed:
+                raise ValidationError(
+                    f"Extracted ZIP contents exceed {settings.max_upload_size_mb} MB.",
+                    error_code="zip_expanded_too_large",
+                )
+            out.append((safe_name, member_data))
     return out
 
 

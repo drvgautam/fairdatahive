@@ -50,6 +50,20 @@ async def test_zip_upload_extracts_members(minio_stub: MagicMock) -> None:
     assert minio_stub.upload_bytes.await_count == 2
 
 
+async def test_zip_upload_rejects_path_traversal(minio_stub: MagicMock) -> None:
+    data = _zip_bytes(("../../evil.csv", b"x"))
+    with pytest.raises(ValidationError, match="not allowed"):
+        await upload_and_maybe_extract(
+            minio_stub,
+            scope="public",
+            resource_id="draft-1",
+            file_bytes=data,
+            filename="bad.zip",
+            media_type="application/zip",
+        )
+    minio_stub.upload_bytes.assert_not_called()
+
+
 async def test_zip_upload_rejects_empty_archive(minio_stub: MagicMock) -> None:
     data = _zip_bytes()
     with pytest.raises(ValidationError, match="no files"):
