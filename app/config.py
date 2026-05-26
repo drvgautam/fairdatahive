@@ -30,6 +30,10 @@ class Settings(BaseSettings):
 
     keycloak_url: str = Field(default="http://localhost:8080")
     keycloak_realm: str = Field(default="fairdatahive")
+    keycloak_client_id: str | None = Field(
+        default=None,
+        description="OAuth client ID; when set, JWT access tokens must include this aud.",
+    )
 
     redis_url: str = Field(default="redis://localhost:6379/0")
 

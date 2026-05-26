@@ -23,7 +23,8 @@ FairDataHive ships with **development defaults** that must be changed before any
 
 | Setting | Development | Production |
 |---------|-------------|------------|
-| `DEV_AUTH_ENABLED` | Often `true` in `.env.example` | **`false`** — use Keycloak JWT validation |
+| `DEV_AUTH_ENABLED` | `false` in `.env.example` | **`false`** — use Keycloak JWT validation |
+| `KEYCLOAK_CLIENT_ID` | Unset (aud not checked) | Set to your API OAuth client; JWT `aud` is verified |
 | Postgres / MinIO / Redis passwords | Default compose values | Strong unique secrets |
 | `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` | `minioadmin` | Rotated credentials |
 | `CORS_ORIGINS` | Local dev URLs | Explicit production UI origins only |

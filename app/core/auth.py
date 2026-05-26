@@ -73,12 +73,15 @@ async def _decode_token(token: str) -> dict[str, Any]:
         raise UnauthorizedError("Signing key not found in JWKS.")
 
     algorithms = [key.get("alg", "RS256")]
+    audience = settings.keycloak_client_id
+    decode_options = {"verify_aud": bool(audience)}
     try:
         claims = jwt.decode(
             token,
             key,
             algorithms=algorithms,
-            options={"verify_aud": False},
+            audience=audience,
+            options=decode_options,
             issuer=settings.issuer_url,
         )
     except JWTError as exc:
