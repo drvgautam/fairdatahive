@@ -1,5 +1,7 @@
 # GitHub repository metadata
 
+Some settings appear **above the README** on the project home page (description, website, topics, social preview). They are configured on GitHub, not read automatically from most repo files.
+
 ## Public documentation site
 
 **https://drvgautam.github.io/fairdatahive/**
@@ -13,9 +15,9 @@ Local copies while developing:
 | http://localhost:8002/docs | API container running |
 | http://localhost:5173/docs | Vite dev server |
 
-## About section (description, topics, website)
+## Apply with GitHub CLI
 
-Apply with GitHub CLI:
+From a machine with `gh auth login` and maintainer access:
 
 ```bash
 gh repo edit drvgautam/fairdatahive \
@@ -33,6 +35,18 @@ gh repo edit drvgautam/fairdatahive \
 2. Source: **GitHub Actions** (not “Deploy from branch” — the workflow uploads `docs/`).
 3. After the first successful **Deploy documentation** run, the site is live.
 
-## Social preview
+## Social preview image
 
-**Settings → General → Social preview** — upload `assets/social-preview.svg` from the repo root (export to PNG 1280×640 if required).
+1. Open **Settings → General → Social preview**.
+2. Upload `assets/social-preview.svg` (export to PNG 1280×640 if GitHub requires raster), or screenshot the logo from the README.
+
+## What is already in the repository
+
+| Item | Location |
+|------|----------|
+| README logo & badges | `README.md`, `assets/logo.svg` |
+| Issue templates | `.github/ISSUE_TEMPLATE/` |
+| Pull request template | `.github/PULL_REQUEST_TEMPLATE.md` |
+| Code of conduct | `CODE_OF_CONDUCT.md` |
+| Security policy | `SECURITY.md` |
+| Contributing | `CONTRIBUTING.md` |
