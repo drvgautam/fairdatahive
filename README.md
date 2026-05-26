@@ -117,6 +117,18 @@ Open:
 - OAI-PMH: <http://localhost:8002/api/v1/oai?verb=Identify>
 - Metrics: <http://localhost:8002/metrics>
 
+## Catalog search
+
+The UI search page (`/search` on the Vite dev server) supports **keyword**, **semantic**, and **auto** modes:
+
+| Mode | Use for |
+|------|---------|
+| **Keyword** | Titles, themes, and keyword tags (including short or comma-separated tags). PostgreSQL full-text search plus a token fallback when FTS misses stop words. |
+| **Semantic** | Natural-language questions; cosine similarity over embeddings computed **at publish time** (sentence-transformers + pgvector). |
+| **Auto** (default) | Keyword first; merges semantic hits when fewer than three keyword results. |
+
+Only published, non-private resources in the selected scope are searchable. Configuration: `EMBEDDING_MODEL`, `SEMANTIC_SEARCH_THRESHOLD` (default `0.30`). Full detail: [project docs → Search engine](docs/index.html#search-detail) (also at `/docs` when the API is running).
+
 ## Local development (without Docker)
 
 ```bash
