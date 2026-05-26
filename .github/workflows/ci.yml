@@ -26,6 +26,9 @@ jobs:
           TESTING: "true"
         run: pytest tests/ -x -m "not integration" --tb=short
 
+      - name: Audit Python dependencies
+        run: pip install pip-audit && pip-audit -r requirements.txt
+
   frontend:
     runs-on: ubuntu-latest
     steps:
@@ -42,3 +45,7 @@ jobs:
         run: |
           npm ci
           npm run build
+
+      - name: Audit npm dependencies
+        working-directory: frontend
+        run: npm audit --audit-level=high
