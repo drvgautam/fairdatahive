@@ -4,7 +4,7 @@ React + TypeScript catalog interface for the FairDataHive API.
 
 ## Features
 
-- **Search** — keyword, semantic, or auto mode with facet filters
+- **Search** — keyword (tags & FTS), semantic (natural language), or auto; facet filters by theme, license, format
 - **Catalog** — browse published resources (public or project scope)
 - **Create** — metadata form, file upload, external/API distributions, optional publish
 - **Resource detail** — versions, FAIR score, downloads, RDF/landing links

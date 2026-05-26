@@ -942,7 +942,7 @@
             </svg>
           </span>
           <h4>Dual-mode Search</h4>
-          <p>Full-text keyword search and semantic vector search over published resources.</p>
+          <p>Keyword search (FTS + tag matching) and semantic vector search over published catalog resources.</p>
         </div>
         <div class="card">
           <span class="card-icon" aria-hidden="true">
@@ -1705,12 +1705,14 @@ npm run dev        # single Vite on http://127.0.0.1:5173 only</code></pre>
 
       <h3>Search</h3>
       <p>
-        The Search page supports three modes selectable from the dropdown next to the search box:
+        The Search page supports three modes selectable from the dropdown next to the search box.
+        Only <strong>published, non-private</strong> resources in the current scope are searchable.
+        See <a href="#search-detail">Search engine</a> for implementation detail.
       </p>
       <ul>
-        <li><strong>Auto</strong> (default) — runs keyword search first; falls back to semantic search when fewer than 3 keyword results are found.</li>
-        <li><strong>Keyword</strong> — PostgreSQL full-text search over title, description, theme, and keywords; if FTS finds no hits, a case-insensitive substring fallback matches partial words and theme names.</li>
-        <li><strong>Semantic</strong> — natural-language queries matched by cosine similarity against stored embeddings.</li>
+        <li><strong>Auto</strong> (default) — keyword search first; if fewer than 3 hits, semantic results are merged in.</li>
+        <li><strong>Keyword</strong> — best for titles, themes, and keyword tags (including short tags like <code>a</code> or comma-separated <code>a,b,c,d</code>). Uses PostgreSQL full-text search plus a token fallback when FTS misses (e.g. single-letter English stop words).</li>
+        <li><strong>Semantic</strong> — best for natural-language questions (e.g. “impedance data for aluminium alloys”). Matches by meaning via embeddings stored at publish time; requires PostgreSQL + pgvector.</li>
       </ul>
       <p>Facet filters for <em>theme</em>, <em>license</em>, and <em>format</em> appear once a query is submitted.</p>
 
@@ -2127,41 +2129,85 @@ DELETE /resources  →  tombstone  (data_deleted=true, metadata retained)</code>
     <section id="search-detail">
       <h2>Search Engine</h2>
 
-      <h3>Keyword search (PostgreSQL FTS + fallback)</h3>
       <p>
-        A GIN index over <code>to_tsvector('english', …)</code> covers title, description, theme,
-        and keywords (see migrations <code>0002_search_indexes</code> and
-        <code>0004_expand_fts_index</code>). Searches use <code>plainto_tsquery</code> and
+        Catalog discovery uses two complementary strategies: <strong>keyword</strong> search
+        (lexical, indexed text) and <strong>semantic</strong> search (vector similarity).
+        The unified endpoint <code>GET /api/v1/search</code> selects or combines them according to
+        <code>mode</code>.
+      </p>
+
+      <h3>Keyword search (PostgreSQL FTS + token fallback)</h3>
+      <p>
+        A GIN index over <code>to_tsvector('english', …)</code> covers <strong>title</strong>,
+        <strong>description</strong>, <strong>theme</strong>, and <strong>keywords</strong>
+        (migrations <code>0002_search_indexes</code>, <code>0004_expand_fts_index</code>).
+        The API builds the same combined text for <code>plainto_tsquery</code> and
         <code>ts_rank</code>. A two-step query (IDs + scores first, then entity load) avoids ORM
         eager-load conflicts.
       </p>
       <p>
-        When FTS returns no rows (e.g. partial tokens like <code>Comput</code> or theme-only
-        matches), the API falls back to <code>ILIKE</code> substring search on the same text
-        fields so the UI still returns relevant catalog entries.
+        English FTS drops very short tokens and can miss comma-separated keyword lists. When FTS
+        alone would fail, a <strong>token fallback</strong> also runs:
+      </p>
+      <ul>
+        <li>The query is split on commas, semicolons, and whitespace (e.g. <code>a,b,c,d</code> → four terms).</li>
+        <li><strong>All</strong> tokens must match (same intent as <code>plainto_tsquery</code> AND behaviour).</li>
+        <li>Tokens longer than two characters: case-insensitive substring match on title, description, theme, and keywords.</li>
+        <li>Short tokens (one–two characters): match <strong>keyword array elements only</strong> (exact element, case-insensitive), so <code>a</code> finds a keyword <code>a</code> but not the letter “a” inside <code>fairdata</code>.</li>
+      </ul>
+      <p>
+        A hit qualifies if either FTS or the token fallback matches. Use <code>mode=keyword</code>
+        when searching by explicit tags or abbreviations.
       </p>
 
       <h3>Semantic search (pgvector)</h3>
       <p>
-        On publish, a background task encodes the concatenated title, description, keywords, and
-        theme into a 768-dimensional vector using the configured sentence-transformers model
-        (<code>multi-qa-mpnet-base-dot-v1</code> by default). Vectors are stored in the
-        <code>embedding</code> column (pgvector type). Search uses cosine similarity
-        (<code>&lt;=&gt;</code> operator) with a configurable threshold.
+        Semantic search finds resources whose <em>meaning</em> is close to the query, not necessarily
+        the same words.
+      </p>
+      <ol>
+        <li>
+          <strong>Indexing (on publish)</strong> — After a resource passes the publish guard, a
+          background task concatenates title, description, keywords (space-separated), and theme
+          (newline-separated blocks), then encodes the text with the configured
+          sentence-transformers model (<code>EMBEDDING_MODEL</code>, default
+          <code>multi-qa-mpnet-base-dot-v1</code>). The 768-dimensional vector is stored in
+          <code>resource_version.embedding</code> (pgvector). Embeddings are not refreshed on
+          later metadata edits unless the resource is published again.
+        </li>
+        <li>
+          <strong>Query</strong> — The user query is encoded with the same model (CPU-bound;
+          first use downloads model weights to the Hugging Face cache and loads the model in-process).
+        </li>
+        <li>
+          <strong>Retrieval</strong> — PostgreSQL ranks rows by cosine similarity
+          (<code>1 − (embedding &lt;=&gt; query_vector)</code>), using an HNSW index
+          (<code>idx_rv_embedding</code>). Only rows with a non-null embedding and similarity ≥
+          <code>SEMANTIC_SEARCH_THRESHOLD</code> (default <code>0.30</code>) are returned, ordered by
+          score descending.
+        </li>
+      </ol>
+      <p>
+        Semantic search requires PostgreSQL with pgvector; it is disabled on SQLite (unit tests).
+        Private published resources are excluded from catalog search the same as for keyword mode.
       </p>
 
       <h3>Auto mode</h3>
       <p>
-        Keyword search runs first. If the result count is fewer than 3, semantic search is also
-        run. Unique semantic results are merged into the keyword results and the combined list is
-        returned with <code>"mode_used": "auto"</code>.
+        Keyword search runs first. If the result count is <strong>fewer than 3</strong>, semantic
+        search is also run. Unique semantic results are appended to the keyword list (no duplicate
+        version IDs). The response uses <code>"mode_used": "auto"</code>. Vague natural-language
+        queries with few lexical hits benefit most; precise keyword or tag queries should use
+        <code>mode=keyword</code>.
       </p>
 
       <h3>Caching</h3>
       <p>
         Results are cached in Redis keyed by a SHA-256 hash of the query parameters. TTLs are
         300 seconds for keyword results and 120 seconds for semantic results. The cache for a
-        scope is invalidated whenever a resource in that scope is published or deleted.
+        scope is invalidated whenever a resource in that scope is published or deleted. After
+        deploying search changes, restart the API and expect cached responses to expire within the
+        TTL (or flush Redis in development).
       </p>
     </section>
 
