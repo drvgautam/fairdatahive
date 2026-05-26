@@ -12,7 +12,7 @@
 
 FastAPI · PostgreSQL + pgvector · MinIO · Redis · React (Vite)
 
-[Documentation](docs/index.html) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+[Documentation](https://drvgautam.github.io/fairdatahive/) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
 
 </div>
 
@@ -111,7 +111,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for branch workflow, PRs, and CI.
 For production: change all default passwords, set `DEV_AUTH_ENABLED=false`, configure Keycloak (`docker compose --profile auth up -d auth`), set `CORS_ORIGINS` and `MINIO_PUBLIC_ENDPOINT`, and restrict admin endpoints.
 
 - Checklist: [SECURITY.md](SECURITY.md)
-- Architecture, env vars, backups: project docs at `/docs` when the API is running (section **Deployment**), or [docs/index.html](docs/index.html#deployment)
+- Architecture, env vars, backups: **[Project documentation](https://drvgautam.github.io/fairdatahive/)** (GitHub Pages) or http://localhost:8002/docs when running locally
 
 ## Configuration notes
 
@@ -132,10 +132,13 @@ More troubleshooting: [CONTRIBUTING.md](CONTRIBUTING.md) and API docs.
 
 | Topic | Where |
 |-------|--------|
-| API reference | http://localhost:8002/swagger |
-| UI guide, search, deployment | http://localhost:8002/docs |
+| **Project guide** (install, API, deployment, search) | **https://drvgautam.github.io/fairdatahive/** |
+| API reference (local) | http://localhost:8002/swagger |
+| Same guide via running API | http://localhost:8002/docs |
 | Frontend | [frontend/README.md](frontend/README.md) |
 | Licenses & embeddings | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
+
+The guide in [`docs/`](docs/) is published automatically on push to `main` (see [`.github/workflows/pages.yml`](.github/workflows/pages.yml)).
 
 ## Contributing
 

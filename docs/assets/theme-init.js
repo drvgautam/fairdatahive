@@ -14,9 +14,7 @@
     var logo = document.querySelector(".sidebar-logo .mark img");
     if (logo) {
       logo.src =
-        theme === "light"
-          ? "/docs/assets/logo-light.svg"
-          : "/docs/assets/logo.svg";
+        theme === "light" ? "assets/logo-light.svg" : "assets/logo.svg";
     }
     var btn = document.querySelector(".theme-toggle");
     if (btn) {
