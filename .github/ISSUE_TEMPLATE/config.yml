@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security advisory
+    url: https://github.com/drvgautam/fairdatahive/security/advisories/new
+    about: Report a vulnerability privately (see SECURITY.md).
+  - name: Documentation
+    url: https://github.com/drvgautam/fairdatahive/blob/main/docs/index.html
+    about: Project guide, API reference, and deployment notes.
