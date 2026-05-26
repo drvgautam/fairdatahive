@@ -739,6 +739,28 @@ button:disabled {
 
 .resource-actions {
   margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.resource-actions .btn-danger {
+  margin-left: auto;
+}
+
+.btn-danger {
+  background: #b91c1c;
+  color: #fff;
+  border: 1px solid #991b1b;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #991b1b;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .fair-panel {

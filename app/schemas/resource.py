@@ -113,6 +113,7 @@ class ResourceVersionSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
+    base_resource_id: str
     title: str
     state: str
     issued: datetime
@@ -120,6 +121,8 @@ class ResourceVersionSummary(BaseModel):
     publisher_sub: str
     theme: str | None = None
     license_id: str | None = None
+    is_private: bool = False
+    data_deleted: bool = False
 
 
 class NewVersionRequest(BaseModel):
