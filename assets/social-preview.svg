@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="FairDataHive">
+  <rect width="1280" height="640" fill="#1d1812"/>
+  <g transform="translate(520 170)">
+    <rect width="240" height="240" rx="48" fill="#2a231c" stroke="#d4a574" stroke-width="4"/>
+    <g transform="translate(120 120)">
+      <polygon points="0,-90 78,-45 78,45 0,90 -78,45 -78,-45"
+               fill="none" stroke="#d4a574" stroke-width="14" stroke-linejoin="round"/>
+      <g stroke="#d4a574" stroke-width="8" stroke-linecap="round" opacity="0.65">
+        <line x1="-40" y1="-25" x2="40" y2="-25"/>
+        <line x1="-40" y1="-25" x2="0" y2="50"/>
+        <line x1="40" y1="-25" x2="0" y2="50"/>
+      </g>
+      <g fill="#d4a574">
+        <circle cx="-40" cy="-25" r="14"/>
+        <circle cx="40" cy="-25" r="14"/>
+        <circle cx="0" cy="50" r="14"/>
+      </g>
+    </g>
+  </g>
+  <text x="640" y="500" text-anchor="middle" fill="#e8e0d4" font-family="system-ui, sans-serif" font-size="56" font-weight="600">FairDataHive</text>
+  <text x="640" y="560" text-anchor="middle" fill="#d4a574" font-family="system-ui, sans-serif" font-size="28">FAIR research data catalog · DCAT 3</text>
+</svg>

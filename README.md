@@ -1,9 +1,22 @@
+<div align="center">
+
+<img src="assets/logo.svg" alt="FairDataHive logo" width="96" />
+
 # FairDataHive
 
+[![CI](https://github.com/drvgautam/fairdatahive/actions/workflows/ci.yml/badge.svg)](https://github.com/drvgautam/fairdatahive/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![DCAT 3](https://img.shields.io/badge/metadata-DCAT%203-0066cc)](https://www.w3.org/TR/vocab-dcat-3/)
 
-FAIR-aligned research data catalog with a DCAT 3 metadata model, REST API, and web UI.  
-**Stack:** FastAPI · PostgreSQL + pgvector · MinIO · Redis · React (Vite).
+**FAIR-aligned research data catalog** — DCAT 3 metadata, REST API, and React UI.
+
+FastAPI · PostgreSQL + pgvector · MinIO · Redis · React (Vite)
+
+[Documentation](docs/index.html) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+
+</div>
+
+---
 
 ## Features
 
@@ -126,7 +139,10 @@ More troubleshooting: [CONTRIBUTING.md](CONTRIBUTING.md) and API docs.
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md) before opening a PR.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md) before opening a PR.  
+We follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+Maintainers: set the GitHub **About** blurb and topics with [`.github/REPOSITORY_METADATA.md`](.github/REPOSITORY_METADATA.md).
 
 ## License
 
