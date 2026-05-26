@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.resource_service import version_relations_options
 
 from app.config import settings
+from app.core.catalog_visibility import public_catalog_version_filters
 from app.core.constants import LICENSE_VOCAB
 from app.models.dataset import Dataset, Distribution
 from app.models.resource import Resource, ResourceVersion
@@ -244,7 +245,7 @@ async def catalog_to_graph(
     stmt = (
         select(ResourceVersion)
         .join(Resource, Resource.current_version_id == ResourceVersion.id)
-        .where(ResourceVersion.state == "published")
+        .where(*public_catalog_version_filters())
         .options(version_relations_options())
         .order_by(ResourceVersion.issued.desc())
     )

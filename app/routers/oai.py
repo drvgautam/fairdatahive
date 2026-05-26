@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.resource_service import version_relations_options
 
 from app.config import settings
+from app.core.catalog_visibility import oai_harvest_version_filters
 from app.core.dependencies import get_db
 from app.models.dataset import Dataset
 from app.models.resource import Resource, ResourceVersion
@@ -92,7 +93,7 @@ def _header(version: ResourceVersion) -> str:
 
 async def _all_published(db: AsyncSession, from_: datetime | None, until: datetime | None, set_: str | None) -> list[ResourceVersion]:
     stmt = select(ResourceVersion).options(version_relations_options())
-    stmt = stmt.where(ResourceVersion.state.in_(("published", "deprecated")))
+    stmt = stmt.where(*oai_harvest_version_filters())
     if from_:
         stmt = stmt.where(ResourceVersion.issued >= from_)
     if until:

@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
+from app.core.catalog_visibility import public_catalog_version_filters
 from app.database import get_session_factory
 from app.models.resource import ResourceVersion
 
@@ -102,8 +103,7 @@ async def search_by_vector(
     stmt = (
         select(ResourceVersion, similarity)
         .where(ResourceVersion.embedding.is_not(None))
-        .where(ResourceVersion.state == "published")
-        .where(ResourceVersion.data_deleted.is_(False))
+        .where(*public_catalog_version_filters())
     )
     if scope is not None:
         from app.models.resource import Resource

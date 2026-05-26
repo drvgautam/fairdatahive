@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config import settings
+from app.core.catalog_visibility import public_catalog_version_filters
 from app.models.dataset import Dataset, Distribution
 from app.models.resource import Resource, ResourceVersion
 from app.schemas.search import (
@@ -26,8 +27,7 @@ def _published_base():
     return (
         select(ResourceVersion)
         .join(Resource, Resource.current_version_id == ResourceVersion.id)
-        .where(ResourceVersion.state == "published")
-        .where(ResourceVersion.data_deleted.is_(False))
+        .where(*public_catalog_version_filters())
     )
 
 
@@ -82,8 +82,7 @@ async def keyword_search(
             select(ResourceVersion.id, score)
             .select_from(ResourceVersion)
             .join(Resource, Resource.current_version_id == ResourceVersion.id)
-            .where(ResourceVersion.state == "published")
-            .where(ResourceVersion.data_deleted.is_(False))
+            .where(*public_catalog_version_filters())
         )
         if scope:
             ranked = ranked.where(Resource.scope == scope)
@@ -216,8 +215,7 @@ async def compute_facets(
         .join(Dataset, Dataset.id == Distribution.dataset_id)
         .join(ResourceVersion, ResourceVersion.id == Dataset.resource_version_id)
         .join(Resource, Resource.current_version_id == ResourceVersion.id)
-        .where(ResourceVersion.state == "published")
-        .where(ResourceVersion.data_deleted.is_(False))
+        .where(*public_catalog_version_filters())
         .where(Distribution.media_type.is_not(None))
     )
     if scope:
@@ -386,14 +384,14 @@ async def catalog_stats(db: AsyncSession) -> CatalogStats:
 
     theme_stmt = (
         select(ResourceVersion.theme, func.count().label("count"))
-        .where(ResourceVersion.state == "published")
+        .where(*public_catalog_version_filters())
         .where(ResourceVersion.theme.is_not(None))
         .group_by(ResourceVersion.theme)
         .order_by(func.count().desc())
     )
     license_stmt = (
         select(ResourceVersion.license_id, func.count().label("count"))
-        .where(ResourceVersion.state == "published")
+        .where(*public_catalog_version_filters())
         .where(ResourceVersion.license_id.is_not(None))
         .group_by(ResourceVersion.license_id)
         .order_by(func.count().desc())

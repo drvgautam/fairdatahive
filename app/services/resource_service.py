@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config import settings
+from app.core.catalog_visibility import public_catalog_version_filters
 from app.core.constants import LICENSE_VOCAB
 from app.core.exceptions import (
     ConflictError,
@@ -444,7 +445,7 @@ async def list_published(
     base = (
         select(ResourceVersion)
         .join(Resource, Resource.current_version_id == ResourceVersion.id)
-        .where(ResourceVersion.state == "published")
+        .where(*public_catalog_version_filters())
     )
     if scope:
         base = base.where(Resource.scope == scope)
