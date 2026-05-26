@@ -11,7 +11,7 @@
 
   function apply(theme) {
     document.documentElement.setAttribute("data-theme", theme);
-    var logo = document.querySelector(".sidebar-logo .mark img");
+    var logo = document.querySelector(".sidebar-brand .mark img");
     if (logo) {
       logo.src =
         theme === "light" ? "assets/logo-light.svg" : "assets/logo.svg";
