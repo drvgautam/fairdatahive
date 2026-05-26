@@ -1,3 +1,10 @@
+FROM node:20-alpine AS ui
+WORKDIR /ui
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
 FROM python:3.12-slim AS builder
 WORKDIR /build
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -18,7 +25,7 @@ COPY static/ ./static/
 COPY templates/ ./templates/
 COPY alembic/ ./alembic/
 COPY alembic.ini .
-COPY frontend/dist/ ./frontend/dist/
+COPY --from=ui /ui/dist ./frontend/dist/
 COPY docker/entrypoint.sh /app/docker/entrypoint.sh
 RUN chmod +x /app/docker/entrypoint.sh
 EXPOSE 8000

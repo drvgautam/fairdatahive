@@ -12,10 +12,10 @@ __pycache__/
 *$py.class
 *.egg-info/
 .eggs/
-# Python packaging output (keep frontend/dist/ — served at /ui/)
+# Python packaging output
 /build/
 /dist/
-!frontend/dist/
+frontend/dist/
 .pytest_cache/
 .coverage
 htmlcov/
