@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Literal
 
-from sqlalchemy import case, func, literal, or_, select, text
+from sqlalchemy import String, and_, case, cast, func, literal, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -45,14 +46,60 @@ def _facet_filter(stmt, *, theme: str | None, license_id: str | None):
     return stmt
 
 
-def _fts_vector():
-    """tsvector over title + description (matches idx_rv_fts GIN index)."""
-    combined = (
+def _query_tokens(q: str) -> list[str]:
+    """Split user query into terms (commas, semicolons, whitespace)."""
+    return [t for t in re.split(r"[\s,;]+", q.strip()) if t]
+
+
+def _keywords_as_text(dialect: str):
+    """Searchable keyword blob (ARRAY on PG, JSON text on SQLite tests)."""
+    if dialect == "postgresql":
+        return func.coalesce(
+            func.array_to_string(ResourceVersion.keywords, " "), ""
+        )
+    return func.coalesce(cast(ResourceVersion.keywords, String), "")
+
+
+def _searchable_text(dialect: str):
+    """Plain text used for FTS — must match idx_rv_fts in migration 0004."""
+    return (
         func.coalesce(ResourceVersion.title, "")
         .op("||")(literal(" "))
         .op("||")(func.coalesce(ResourceVersion.description, ""))
+        .op("||")(literal(" "))
+        .op("||")(func.coalesce(ResourceVersion.theme, ""))
+        .op("||")(literal(" "))
+        .op("||")(_keywords_as_text(dialect))
     )
-    return func.to_tsvector("english", combined)
+
+
+def _fts_vector(dialect: str):
+    return func.to_tsvector("english", _searchable_text(dialect))
+
+
+def _short_token(token: str) -> bool:
+    """Single-letter terms are English FTS stop words and match prose via ILIKE."""
+    return len(token) <= 2
+
+
+def _ilike_token_match(token: str, *, dialect: str):
+    pattern = f"%{token.lower()}%"
+    kw_text = func.lower(_keywords_as_text(dialect))
+    if _short_token(token):
+        return kw_text.like(pattern)
+    return or_(
+        func.lower(ResourceVersion.title).like(pattern),
+        func.lower(ResourceVersion.description).like(pattern),
+        func.lower(func.coalesce(ResourceVersion.theme, "")).like(pattern),
+        kw_text.like(pattern),
+    )
+
+
+def _all_tokens_ilike(q: str, *, dialect: str):
+    tokens = _query_tokens(q)
+    if not tokens:
+        return literal(True)
+    return and_(*[_ilike_token_match(t, dialect=dialect) for t in tokens])
 
 
 async def keyword_search(
@@ -75,9 +122,14 @@ async def keyword_search(
     # PostgreSQL FTS: select id + score only, then load entities (avoids
     # selectinload + add_columns incompatibility on ORM queries).
     if dialect == "postgresql" and q:
-        tsv = _fts_vector()
+        tsv = _fts_vector(dialect)
         tsquery = func.plainto_tsquery("english", q)
-        score = func.ts_rank(tsv, tsquery).label("score")
+        token_match = _all_tokens_ilike(q, dialect=dialect)
+        ilike_score = literal(0.05)
+        score = func.greatest(
+            func.coalesce(func.ts_rank(tsv, tsquery), 0),
+            case((token_match, ilike_score), else_=literal(0)),
+        ).label("score")
         ranked = (
             select(ResourceVersion.id, score)
             .select_from(ResourceVersion)
@@ -90,7 +142,7 @@ async def keyword_search(
             ranked = ranked.where(ResourceVersion.theme == theme)
         if license_id:
             ranked = ranked.where(ResourceVersion.license_id == license_id)
-        ranked = ranked.where(tsv.op("@@")(tsquery))
+        ranked = ranked.where(or_(tsv.op("@@")(tsquery), token_match))
 
         total = int(
             (await db.execute(select(func.count()).select_from(ranked.subquery()))).scalar()
@@ -120,16 +172,10 @@ async def keyword_search(
         out.sort(key=lambda pair: pair[1], reverse=True)
         return out, total
 
-    # SQLite / fallback: LIKE filter (no eager-load; summary only needs columns).
-    pattern = f"%{q.lower()}%" if q else None
+    # SQLite / fallback: token ILIKE over title, description, theme, keywords.
     score_expr = literal(1.0).label("score")
-    if pattern:
-        base = base.where(
-            or_(
-                func.lower(ResourceVersion.title).like(pattern),
-                func.lower(ResourceVersion.description).like(pattern),
-            )
-        )
+    if q:
+        base = base.where(_all_tokens_ilike(q, dialect=dialect))
     base = base.add_columns(score_expr)
 
     total = int(

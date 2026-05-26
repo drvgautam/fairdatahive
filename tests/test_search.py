@@ -40,6 +40,43 @@ async def test_keyword_search_filters_by_query(client):
     assert not any("cats" in t for t in titles)
 
 
+async def _publish_with_keywords(client, keywords: list[str]):
+    payload = {
+        **VALID_PAYLOAD,
+        "title": "Dataset without keyword letters in title",
+        "description": (
+            "Neutral description that does not mention the short keyword tokens."
+        ),
+        "keywords": keywords,
+    }
+    create = await client.post("/api/v1/resources", json=payload)
+    body = create.json()
+    await client.post(f"/api/v1/resources/{body['id']}/publish")
+    return body["id"]
+
+
+async def test_keyword_search_matches_short_keywords(client):
+    await _publish_with_keywords(client, ["a", "b", "c", "d"])
+    await _publish_with_keywords(client, ["x", "y"])
+
+    abcd_title = "Dataset without keyword letters in title"
+    for query in ("a,b,c,d", "a b c d", "a"):
+        resp = await client.get(f"/api/v1/search?q={query}&mode=keyword")
+        assert resp.status_code == 200, resp.text
+        data = resp.json()
+        titles = [hit["resource"]["title"] for hit in data["results"]]
+        assert any(abcd_title in t for t in titles), (
+            f"expected abcd dataset for query {query!r}, got {titles!r}"
+        )
+
+
+async def test_keyword_search_matches_stored_keyword_terms(client):
+    await _publish_with_keywords(client, ["electrochemistry", "impedance"])
+    resp = await client.get("/api/v1/search?q=impedance&mode=keyword")
+    assert resp.status_code == 200
+    assert resp.json()["total"] >= 1
+
+
 async def test_search_suggest(client):
     await _publish_with_title(client, "Corrosion impedance study")
     resp = await client.get("/api/v1/search/suggest?q=corr")
