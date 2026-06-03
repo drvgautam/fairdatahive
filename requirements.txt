@@ -10,7 +10,7 @@ httpx==0.28.1
 aioboto3==12.4.0
 redis==5.0.4
 sentence-transformers==3.0.1
-rdflib==7.0.0
+rdflib==7.6.0
 pyshacl==0.25.0
 aiosmtplib==3.0.1
 pgvector==0.2.5
