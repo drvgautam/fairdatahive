@@ -57,9 +57,9 @@ async def landing_page(
     fair = await compute_fair_score(db, version)
     versions = await list_versions_if_viewable(db, version.base_resource_id, sub)
     return _TEMPLATES.TemplateResponse(
+        request,
         "landing.html",
         {
-            "request": request,
             "version": version,
             "jsonld": jsonld,
             "fair": fair,

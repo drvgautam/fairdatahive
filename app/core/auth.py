@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from typing import Any
 
 import httpx
+import jwt
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import jwt
-from jose.exceptions import JWTError
+from jwt.exceptions import PyJWKError, PyJWTError
 
 from app.config import settings
 from app.core.exceptions import UnauthorizedError
@@ -57,7 +57,7 @@ def _find_key(jwks: dict[str, Any], kid: str | None) -> dict[str, Any] | None:
 async def _decode_token(token: str) -> dict[str, Any]:
     try:
         unverified_header = jwt.get_unverified_header(token)
-    except JWTError as exc:
+    except PyJWTError as exc:
         raise UnauthorizedError("Invalid bearer token header.") from exc
 
     kid = unverified_header.get("kid")
@@ -72,19 +72,23 @@ async def _decode_token(token: str) -> dict[str, Any]:
     if key is None:
         raise UnauthorizedError("Signing key not found in JWKS.")
 
-    algorithms = [key.get("alg", "RS256")]
-    audience = settings.keycloak_client_id
-    decode_options = {"verify_aud": bool(audience)}
+    algorithm = key.get("alg", "RS256")
+    try:
+        signing_key = jwt.PyJWK(key, algorithm=algorithm)
+    except PyJWKError as exc:
+        raise UnauthorizedError("Signing key in JWKS is not usable.") from exc
+
+    audience = settings.keycloak_client_id or None
     try:
         claims = jwt.decode(
             token,
-            key,
-            algorithms=algorithms,
+            signing_key,
+            algorithms=[algorithm],
             audience=audience,
-            options=decode_options,
             issuer=settings.issuer_url,
+            options={"verify_aud": audience is not None},
         )
-    except JWTError as exc:
+    except PyJWTError as exc:
         raise UnauthorizedError(f"Token verification failed: {exc}") from exc
 
     return claims

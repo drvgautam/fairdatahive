@@ -1539,7 +1539,7 @@ docker compose up -d --force-recreate api</code></pre>
 KEYCLOAK_URL=https://idp.example.org
 KEYCLOAK_REALM=fairdatahive</code></pre>
       <p>
-        The API validates JWTs via JWKS (<code>python-jose</code>, RS256, issuer checked). Configure
+        The API validates JWTs via JWKS (<code>PyJWT</code>, RS256, issuer checked). Configure
         your IdP (Keycloak or institutional OIDC) to issue tokens with a stable <code>sub</code> claim —
         that value becomes <code>owner_sub</code> / <code>publisher_sub</code> on records. The Compose
         <code>auth</code> profile (<code>docker compose --profile auth up -d auth</code>) runs Keycloak
@@ -2149,7 +2149,7 @@ DELETE /resources  →  tombstone  (data_deleted=true, metadata retained)</code>
       <ol class="steps">
         <li>Request arrives with <code>Authorization: Bearer &lt;token&gt;</code>.</li>
         <li>API fetches JWKS from Keycloak (cached for 1 hour).</li>
-        <li>Token is verified with <code>python-jose</code> (RS256, issuer checked, audience not checked).</li>
+        <li>Token is verified with <code>PyJWT</code> (RS256, issuer checked, audience not checked).</li>
         <li>Claims are mapped to <code>CurrentUser(sub, email, name, preferred_username)</code>.</li>
         <li>The <code>sub</code> claim is stored as <code>owner_sub</code> / <code>publisher_sub</code> on created records.</li>
       </ol>

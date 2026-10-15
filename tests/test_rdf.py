@@ -62,6 +62,17 @@ async def test_catalog_turtle_contains_published_resource(client):
     assert any(version_id in str(d) for d in datasets)
 
 
+async def test_landing_page_renders(client):
+    create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
+    version_id = create.json()["id"]
+    await client.post(f"/api/v1/resources/{version_id}/publish")
+
+    page = await client.get(f"/api/v1/resources/{version_id}/landing")
+    assert page.status_code == 200
+    assert page.headers["content-type"].startswith("text/html")
+    assert VALID_PAYLOAD["title"] in page.text
+
+
 async def test_content_negotiation_on_resource_endpoint(client):
     create = await client.post("/api/v1/resources", json=VALID_PAYLOAD)
     version_id = create.json()["id"]
