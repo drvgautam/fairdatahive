@@ -9,7 +9,7 @@ pydantic-settings==2.7.1
 PyJWT[crypto]==2.15.1
 httpx==0.28.1
 aioboto3==12.4.0
-redis==5.0.4
+redis==8.1.0
 sentence-transformers==5.7.0
 transformers==5.19.0
 rdflib==7.0.0
