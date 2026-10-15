@@ -35,7 +35,7 @@ async def _make_version(db, **overrides) -> ResourceVersion:
         ),
         state=overrides.get("state", "draft"),
         publisher_sub="owner-1",
-        theme=overrides.get("theme", "Electrochemistry"),
+        theme=overrides.get("theme", "EarthScience"),
         keywords=overrides.get("keywords", ["a", "b"]),
         license_id=overrides.get("license_id"),
         doi=overrides.get("doi"),
@@ -90,8 +90,8 @@ async def test_fair_score_well_described_resource(db):
         license_id="CC-BY-4.0",
         language="en",
         provenance=(
-            "Collected by automated sampling at the EUSC group lab using a "
-            "Gamry FRA at 25C."
+            "Collected by automated sampling at a municipal sensor station "
+            "at 25C."
         ),
         rights_statement="Cite this dataset when reusing.",
     )
@@ -126,7 +126,7 @@ async def test_fair_dimension_score_calculation(db):
         title="A title",
         description="A" * 60,
         keywords=["k1", "k2"],
-        theme="Electrochemistry",
+        theme="EarthScience",
         doi=None,
     )
     score = await compute_fair_score(db, version)

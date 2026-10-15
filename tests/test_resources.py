@@ -7,24 +7,24 @@ pytestmark = pytest.mark.asyncio
 
 VALID_PAYLOAD = {
     "scope": "public",
-    "title": "EIS measurements on AA2024 alloy",
+    "title": "Urban air quality measurements",
     "description": (
-        "Electrochemical impedance spectra collected at OCP for AA2024 "
-        "samples exposed to 0.5M NaCl solution."
+        "Hourly PM2.5 and NO2 concentrations recorded by a network of city "
+        "sensor stations over one year."
     ),
-    "keywords": ["electrochemistry", "impedance"],
-    "theme": "Electrochemistry",
+    "keywords": ["air quality", "particulates"],
+    "theme": "EarthScience",
     "language": "en",
     "license_id": "CC-BY-4.0",
-    "provenance": "Collected at the EUSC group using Gamry FRA on June 1, 2025.",
+    "provenance": "Collected by a municipal sensor network on June 1, 2025.",
     "rights_statement": "Cite this dataset when reusing.",
     "datasets": [
         {
             "distributions": [
                 {
                     "dist_type": "upload",
-                    "title": "eis-data.csv",
-                    "upload_token": "public/draft-1/eis-data.csv",
+                    "title": "air-quality.csv",
+                    "upload_token": "public/draft-1/air-quality.csv",
                     "media_type": "text/csv",
                     "checksum_sha256": "a" * 64,
                     "byte_size": 12345,
