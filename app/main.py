@@ -82,7 +82,7 @@ def create_app() -> FastAPI:
         version="1.0.0",
         description=(
             "FAIR-compliant research data catalog implementing DCAT 3 on top of "
-            "PostgreSQL + pgvector + MinIO."
+            "PostgreSQL + pgvector + S3-compatible object storage."
         ),
         lifespan=lifespan,
         docs_url="/swagger" if settings.enable_openapi else None,

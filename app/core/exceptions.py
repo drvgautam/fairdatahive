@@ -66,6 +66,13 @@ class PublishGuardError(ValidationError):
     error_code = "publish_guard_failed"
 
 
+class StorageError(AppError):
+    """Object storage (S3) is unreachable, misconfigured, or rejected the operation."""
+
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    error_code = "storage_unavailable"
+
+
 def _is_json_serializable(value: Any) -> bool:
     if value is None or isinstance(value, (str, int, float, bool)):
         return True

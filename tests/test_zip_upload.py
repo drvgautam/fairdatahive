@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from app.core.exceptions import ValidationError
-from app.services.minio_service import upload_and_maybe_extract
+from app.services.object_storage_service import upload_and_maybe_extract
 
 pytestmark = pytest.mark.asyncio
 

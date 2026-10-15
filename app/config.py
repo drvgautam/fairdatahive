@@ -1,9 +1,31 @@
 from __future__ import annotations
 
+import logging
+import os
 from functools import lru_cache
+from typing import Literal
 
-from pydantic import Field
+from pydantic import AliasChoices, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
+
+# (canonical S3_* variable, legacy MINIO_* alias). The legacy names are accepted for
+# one transition release; when both are set the S3_* value wins and a warning is logged.
+S3_LEGACY_ENV_ALIASES: tuple[tuple[str, str], ...] = (
+    ("S3_ENDPOINT", "MINIO_ENDPOINT"),
+    ("S3_PUBLIC_ENDPOINT", "MINIO_PUBLIC_ENDPOINT"),
+    ("S3_ACCESS_KEY", "MINIO_ACCESS_KEY"),
+    ("S3_SECRET_KEY", "MINIO_SECRET_KEY"),
+    ("S3_BUCKET", "MINIO_BUCKET"),
+    ("S3_REGION", "MINIO_REGION"),
+)
+
+
+def _env_has(name: str) -> bool:
+    """True when ``name`` is set in the process environment (case-insensitive)."""
+    upper = name.upper()
+    return any(k.upper() == upper for k in os.environ)
 
 
 class Settings(BaseSettings):
@@ -18,15 +40,42 @@ class Settings(BaseSettings):
         default="postgresql+asyncpg://fairdatahive:fairdatahive@localhost:5432/fairdatahive"
     )
 
-    minio_endpoint: str = Field(default="http://localhost:9000")
-    minio_public_endpoint: str | None = Field(
-        default=None,
-        description="Browser-reachable MinIO URL for presigned downloads (e.g. http://localhost:9000).",
+    # --- Object storage (any S3-compatible service: RustFS, MinIO, AWS S3, Ceph) ---
+    s3_endpoint: str = Field(
+        default="http://localhost:9000",
+        validation_alias=AliasChoices("S3_ENDPOINT", "MINIO_ENDPOINT"),
+        description="Internal API-to-storage S3 endpoint.",
     )
-    minio_access_key: str = Field(default="minioadmin")
-    minio_secret_key: str = Field(default="minioadmin")
-    minio_bucket: str = Field(default="fairdatahive-catalog")
-    minio_region: str = Field(default="us-east-1")
+    s3_public_endpoint: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("S3_PUBLIC_ENDPOINT", "MINIO_PUBLIC_ENDPOINT"),
+        description=(
+            "Browser-reachable S3 URL used when signing download URLs "
+            "(e.g. http://localhost:9002 or https://objects.example.org)."
+        ),
+    )
+    s3_access_key: str = Field(
+        default="minioadmin",
+        validation_alias=AliasChoices("S3_ACCESS_KEY", "MINIO_ACCESS_KEY"),
+        description="Restricted application credential (never the storage root key).",
+    )
+    s3_secret_key: str = Field(
+        default="minioadmin",
+        validation_alias=AliasChoices("S3_SECRET_KEY", "MINIO_SECRET_KEY"),
+    )
+    s3_bucket: str = Field(
+        default="fairdatahive-catalog",
+        validation_alias=AliasChoices("S3_BUCKET", "MINIO_BUCKET"),
+    )
+    s3_region: str = Field(
+        default="us-east-1",
+        validation_alias=AliasChoices("S3_REGION", "MINIO_REGION"),
+        description="Explicit SigV4 signing region.",
+    )
+    s3_addressing_style: Literal["path", "virtual", "auto"] = Field(
+        default="path",
+        description="botocore addressing style; self-hosted S3 services need 'path'.",
+    )
 
     keycloak_url: str = Field(default="http://localhost:8080")
     keycloak_realm: str = Field(default="fairdatahive")
@@ -70,10 +119,30 @@ class Settings(BaseSettings):
     dev_auth_sub: str = Field(default="dev-user")
     dev_auth_name: str = Field(default="Development User")
 
+    @model_validator(mode="after")
+    def _warn_on_legacy_storage_aliases(self) -> "Settings":
+        """Warn (without printing values) when both S3_* and MINIO_* names are set."""
+        for new_name, legacy_name in S3_LEGACY_ENV_ALIASES:
+            if _env_has(new_name) and _env_has(legacy_name):
+                logger.warning(
+                    "Both %s and legacy %s are set; using %s. "
+                    "Remove %s - the MINIO_* aliases are deprecated.",
+                    new_name,
+                    legacy_name,
+                    new_name,
+                    legacy_name,
+                )
+        return self
+
     @property
-    def minio_public_url(self) -> str:
+    def legacy_storage_env_in_use(self) -> list[str]:
+        """Legacy MINIO_* variables present in the environment (for startup diagnostics)."""
+        return [legacy for _, legacy in S3_LEGACY_ENV_ALIASES if _env_has(legacy)]
+
+    @property
+    def s3_public_url(self) -> str:
         """URL embedded in presigned download links (must resolve in the user's browser)."""
-        return (self.minio_public_endpoint or self.minio_endpoint).rstrip("/")
+        return (self.s3_public_endpoint or self.s3_endpoint).rstrip("/")
 
     @property
     def jwks_url(self) -> str:
