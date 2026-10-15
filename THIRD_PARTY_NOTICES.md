@@ -9,7 +9,8 @@ See `requirements.txt` and `frontend/package.json` for full dependency lists. Ma
 - **FastAPI** — MIT License
 - **SQLAlchemy** — MIT License
 - **PostgreSQL / pgvector** — PostgreSQL License / open-source extensions
-- **MinIO** — GNU AGPL v3 (server); client libraries used here have their own licenses
+- **RustFS** — Apache-2.0 (S3-compatible object store used by Compose)
+- **aioboto3 / botocore** — Apache-2.0 (S3 client)
 - **React / Vite** — MIT License
 - **rdflib** — BSD-3-Clause
 - **pyshacl** — Apache-2.0

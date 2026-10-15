@@ -25,14 +25,14 @@ from app.core.exceptions import (
     ForbiddenError,
     GoneError,
     NotFoundError,
+    StorageError,
     UnauthorizedError,
     ValidationError,
 )
 from app.schemas.dataset import PresignedDownloadResponse, UploadResponse
 from app.services import access_service, audit_service
-from app.services.minio_service import (
-    MinioService,
-    get_minio_service,
+from app.services.object_storage_service import (
+    get_object_storage_service,
     upload_and_maybe_extract,
 )
 
@@ -85,15 +85,14 @@ async def upload_file(
             error_code="file_too_large",
         )
 
-    minio = get_minio_service()
-    try:
-        await minio.ensure_bucket()
-    except Exception as exc:  # pragma: no cover - bucket creation best-effort
-        logger.debug("ensure_bucket: %s", exc)
+    # The bucket is provisioned explicitly at deploy time (docker/entrypoint.sh or
+    # `python -m app.tools.provision_storage`); upload failures surface as 503
+    # StorageError rather than triggering bucket creation from a request.
+    storage = get_object_storage_service()
 
     target_resource = resource_id or f"draft-{user.sub[:8]}-{uuid.uuid4().hex[:8]}"
     result = await upload_and_maybe_extract(
-        minio,
+        storage,
         scope=scope,
         resource_id=target_resource,
         file_bytes=data,
@@ -146,12 +145,14 @@ async def download_distribution(
             )
 
     if distribution.dist_type == "upload":
-        minio = get_minio_service()
+        storage = get_object_storage_service()
         try:
-            url = await minio.presigned_url(distribution.download_url)
+            url = await storage.presigned_url(distribution.download_url)
+        except StorageError:
+            raise
         except Exception as exc:
             logger.warning("presigned_url failed: %s", exc)
-            raise NotFoundError(
+            raise StorageError(
                 "Failed to generate download URL.",
                 error_code="presign_failed",
             ) from exc

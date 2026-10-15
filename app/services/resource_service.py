@@ -571,13 +571,22 @@ async def list_owned_versions(
 async def _tombstone_versions(
     db: AsyncSession, versions: list[ResourceVersion]
 ) -> None:
-    from app.services.minio_service import get_minio_service
+    """Mark versions deleted and remove their uploaded objects.
 
-    minio = None
+    Metadata rows are retained (tombstone). For uploaded distributions the
+    object is deleted from storage first; if that delete fails the object key is
+    **kept** on the distribution (the version is already ``data_deleted`` so it
+    is not downloadable) and logged at ERROR level, so the orphaned object can
+    be retried or reconciled by ``scripts/migrate_objects.py --verify``.
+    """
+    from app.core.exceptions import StorageError
+    from app.services.object_storage_service import get_object_storage_service
+
+    storage = None
     try:
-        minio = get_minio_service()
-    except Exception:  # pragma: no cover - test env may not have MinIO
-        minio = None
+        storage = get_object_storage_service()
+    except Exception:  # pragma: no cover - test env may not have storage
+        storage = None
 
     for v in versions:
         v.data_deleted = True
@@ -591,11 +600,19 @@ async def _tombstone_versions(
         )
         dists = list((await db.execute(dist_stmt)).scalars().all())
         for d in dists:
-            if d.dist_type == "upload" and d.download_url and minio is not None:
+            if d.dist_type == "upload" and d.download_url and storage is not None:
                 try:
-                    await minio.delete_object(d.download_url)
-                except Exception as exc:  # pragma: no cover
-                    logger.warning("delete %s failed: %s", d.download_url, exc)
+                    await storage.delete_object(d.download_url)
+                except StorageError as exc:
+                    logger.error(
+                        "tombstone: object delete failed, key retained for "
+                        "reconciliation distribution=%s key=%s error=%s",
+                        d.id,
+                        d.download_url,
+                        exc.error_code,
+                    )
+                    d.access_url = None
+                    continue
             d.download_url = None
             d.access_url = None
 

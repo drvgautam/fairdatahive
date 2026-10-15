@@ -1069,7 +1069,7 @@
             <tr><td><strong>API</strong></td><td>FastAPI 0.111, Python 3.12</td><td>REST API, business logic, async I/O</td></tr>
             <tr><td><strong>ORM / Migrations</strong></td><td>SQLAlchemy 2.0 async, Alembic</td><td>Schema management, typed queries</td></tr>
             <tr><td><strong>Primary database</strong></td><td>PostgreSQL 16 + pgvector</td><td>Relational storage, FTS indexes, vector search</td></tr>
-            <tr><td><strong>Object storage</strong></td><td>MinIO (S3-compatible)</td><td>File uploads, presigned download URLs</td></tr>
+            <tr><td><strong>Object storage</strong></td><td>RustFS (S3 API; also MinIO/AWS/Ceph)</td><td>File uploads, presigned download URLs</td></tr>
             <tr><td><strong>Cache</strong></td><td>Redis 7</td><td>Search result caching, TTL invalidation</td></tr>
             <tr><td><strong>Embeddings</strong></td><td>sentence-transformers (in-process)</td><td>768-dim vectors for semantic search</td></tr>
             <tr><td><strong>RDF</strong></td><td>rdflib 7</td><td>Turtle / JSON-LD / OAI-DC generation</td></tr>
@@ -1087,8 +1087,8 @@
           <tbody>
             <tr><td><strong>API</strong></td><td>8000</td><td><strong>8002</strong></td><td>Docs at <code>/docs</code>; Swagger at <code>/swagger</code>; UI at <code>/ui</code></td></tr>
             <tr><td><strong>PostgreSQL</strong></td><td>5432</td><td><strong>5434</strong></td><td>Avoids conflict with local Postgres on 5432</td></tr>
-            <tr><td><strong>MinIO S3</strong></td><td>9000</td><td><strong>9002</strong></td><td>Set <code>MINIO_PUBLIC_ENDPOINT=http://localhost:9002</code></td></tr>
-            <tr><td><strong>MinIO console</strong></td><td>9001</td><td><strong>9003</strong></td><td>Default login <code>minioadmin / minioadmin</code></td></tr>
+            <tr><td><strong>RustFS S3</strong></td><td>9000</td><td><strong>9002</strong></td><td>Set <code>S3_PUBLIC_ENDPOINT=http://localhost:9002</code></td></tr>
+            <tr><td><strong>RustFS console</strong></td><td>9001</td><td><strong>9003</strong></td><td>Loopback only; local login <code>rustfsadmin / rustfsadmin</code></td></tr>
             <tr><td><strong>Redis</strong></td><td>6379</td><td><em>none</em></td><td>Internal compose network only</td></tr>
             <tr><td><strong>Keycloak</strong></td><td>8080</td><td>8080</td><td>Optional: <code>docker compose --profile auth up -d auth</code></td></tr>
             <tr><td><strong>React UI (dev)</strong></td><td>—</td><td><strong>5173</strong></td><td>Local only: <code>cd frontend && npm run dev</code> (<code>strictPort</code>)</td></tr>
@@ -1106,7 +1106,7 @@
   └── :8002/docs guide · :8002/swagger OpenAPI             │
                 │                                           │
                 ├── postgres   (host :5434)
-                ├── minio      (host :9002 / :9003)
+                ├── rustfs     (host :9002 / :9003)
                 ├── redis      (internal)
                 └── auth       (optional profile, :8080)
 
@@ -1167,7 +1167,7 @@ cd fairdatahive</code></pre>
             <pre><span class="pre-label">bash</span><code>docker compose build
 docker compose up -d</code></pre>
             <p>
-              Starts <strong>postgres</strong>, <strong>minio</strong>, <strong>redis</strong>, and
+              Starts <strong>postgres</strong>, <strong>rustfs</strong>, <strong>redis</strong>, and
               <strong>api</strong> only — not a Vite/Node UI container. The API runs Alembic
               migrations on startup; wait ~15 seconds on first boot.
             </p>
@@ -1177,7 +1177,7 @@ docker compose up -d</code></pre>
           <div>
             <strong>Verify the API is healthy.</strong>
             <pre><span class="pre-label">bash</span><code>curl http://localhost:8002/api/v1/health
-# {"status":"ok","components":{"database":"ok","cache":"ok"}}</code></pre>
+# {"status":"ok","components":{"database":"ok","cache":"ok","storage":"ok"}}</code></pre>
           </div>
         </li>
         <li>
@@ -1215,7 +1215,7 @@ docker compose build api && docker compose up -d --force-recreate api</code></pr
             <tr><td><strong>React UI (built)</strong></td><td><a href="http://localhost:8002/ui/" target="_blank">http://localhost:8002/ui/</a> — after <code>npm run build</code></td></tr>
             <tr><td><strong>Documentation</strong></td><td><a href="http://localhost:5173/docs" target="_blank">http://localhost:5173/docs</a> (or <a href="http://localhost:8002/docs" target="_blank">:8002/docs</a> via API)</td></tr>
             <tr><td><strong>Swagger / OpenAPI</strong></td><td><a href="http://localhost:8002/swagger" target="_blank">http://localhost:8002/swagger</a> (proxied from Vite as <code>/swagger</code>)</td></tr>
-            <tr><td><strong>MinIO console</strong></td><td><a href="http://localhost:9003" target="_blank">http://localhost:9003</a> — <code>minioadmin / minioadmin</code></td></tr>
+            <tr><td><strong>RustFS console</strong></td><td><a href="http://localhost:9003" target="_blank">http://localhost:9003</a> — <code>rustfsadmin / rustfsadmin</code> (loopback)</td></tr>
             <tr><td><strong>Catalog (Turtle)</strong></td><td><a href="http://localhost:8002/api/v1/catalog.ttl" target="_blank">http://localhost:8002/api/v1/catalog.ttl</a></td></tr>
             <tr><td><strong>OAI-PMH endpoint</strong></td><td><a href="http://localhost:8002/api/v1/oai?verb=Identify" target="_blank">http://localhost:8002/api/v1/oai?verb=Identify</a></td></tr>
             <tr><td><strong>Prometheus metrics</strong></td><td><a href="http://localhost:8002/metrics" target="_blank">http://localhost:8002/metrics</a></td></tr>
@@ -1256,21 +1256,29 @@ docker compose build api && docker compose up -d --force-recreate api</code></pr
         </table>
       </div>
 
-      <h3>Object storage (MinIO / S3)</h3>
+      <h3>Object storage (RustFS / S3)</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>MINIO_ENDPOINT</code></td><td><code>http://minio:9000</code></td><td>S3 endpoint used by the API container (Docker hostname)</td></tr>
-            <tr><td><code>MINIO_PUBLIC_ENDPOINT</code></td><td><code>http://localhost:9002</code></td><td>Browser-facing URL embedded in presigned download links (host port from compose).</td></tr>
-            <tr><td><code>MINIO_ACCESS_KEY</code></td><td><code>minioadmin</code></td><td>S3 access key</td></tr>
-            <tr><td><code>MINIO_SECRET_KEY</code></td><td><code>minioadmin</code></td><td>S3 secret key</td></tr>
-            <tr><td><code>MINIO_BUCKET</code></td><td><code>fairdatahive-catalog</code></td><td>Bucket name for file uploads</td></tr>
+            <tr><td><code>S3_ENDPOINT</code></td><td><code>http://rustfs:9000</code></td><td>S3 endpoint used by the API container (Docker hostname)</td></tr>
+            <tr><td><code>S3_PUBLIC_ENDPOINT</code></td><td><code>http://localhost:9002</code></td><td>Browser-facing URL embedded in presigned download links (host port from compose).</td></tr>
+            <tr><td><code>S3_ACCESS_KEY</code></td><td><code>rustfsadmin</code></td><td>Restricted application credential (not the server root in production)</td></tr>
+            <tr><td><code>S3_SECRET_KEY</code></td><td><code>rustfsadmin</code></td><td>Application credential secret</td></tr>
+            <tr><td><code>S3_BUCKET</code></td><td><code>fairdatahive-catalog</code></td><td>Bucket name for file uploads</td></tr>
+            <tr><td><code>S3_REGION</code></td><td><code>us-east-1</code></td><td>SigV4 signing region</td></tr>
+            <tr><td><code>S3_ADDRESSING_STYLE</code></td><td><code>path</code></td><td>Path-style addressing for self-hosted S3</td></tr>
+            <tr><td><code>PROVISION_STORAGE</code></td><td><code>true</code></td><td>Entrypoint creates the bucket if missing</td></tr>
             <tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td><code>500</code></td><td>Maximum per-file upload size in megabytes</td></tr>
             <tr><td><code>PRESIGNED_URL_EXPIRY_SECONDS</code></td><td><code>3600</code></td><td>Presigned download URL lifetime</td></tr>
           </tbody>
         </table>
       </div>
+      <p>
+        Legacy <code>MINIO_*</code> names are accepted for one transition release; when both are set,
+        <code>S3_*</code> wins. Cutover from an existing MinIO volume is documented in
+        <a href="./storage-migration.md">docs/storage-migration.md</a>.
+      </p>
 
       <h3>Authentication</h3>
       <div class="table-wrap">
@@ -1365,7 +1373,7 @@ docker compose build api && docker compose up -d --force-recreate api</code></pr
           <tbody>
             <tr><td><strong>API</strong> (FastAPI)</td><td>REST, RDF, OAI-PMH, presigned URLs, FAIR scoring</td><td>Stateless</td><td>CPU/RAM for embeddings on semantic search; rebuild image on release</td></tr>
             <tr><td><strong>PostgreSQL 16 + pgvector</strong></td><td>Catalog metadata, FTS, vector index, audit</td><td>Durable volume</td><td>Back up regularly; extensions required at init</td></tr>
-            <tr><td><strong>MinIO / S3</strong></td><td>Uploaded files and ZIP extracts</td><td>Durable volume or external bucket</td><td>Must be reachable from API <em>and</em> browsers (see public endpoint)</td></tr>
+            <tr><td><strong>RustFS / S3</strong></td><td>Uploaded files and ZIP extracts</td><td>Durable volume or external bucket</td><td>Must be reachable from API <em>and</em> browsers (see public endpoint)</td></tr>
             <tr><td><strong>Redis</strong></td><td>Search result cache</td><td>Optional persistence</td><td>Safe to flush; cache rebuilds on traffic</td></tr>
             <tr><td><strong>Keycloak</strong> (optional)</td><td>OIDC/JWT issuer</td><td>Its own DB in real deployments</td><td>Compose profile <code>auth</code> is dev-oriented only</td></tr>
             <tr><td><strong>React UI</strong></td><td>Human catalog interface</td><td>Static files in <code>frontend/dist</code></td><td>Served by API at <code>/ui</code> or separate CDN</td></tr>
@@ -1375,7 +1383,7 @@ docker compose build api && docker compose up -d --force-recreate api</code></pr
       <p>
         The bundled <code>docker-compose.yml</code> maps host ports to avoid clashes on developer
         machines (<strong>8002</strong> API, <strong>5434</strong> Postgres, <strong>9002/9003</strong>
-        MinIO). In production behind a reverse proxy you typically expose <strong>443</strong> only
+        RustFS). In production behind a reverse proxy you typically expose <strong>443</strong> only
         and keep data services on an internal network.
       </p>
 
@@ -1392,7 +1400,7 @@ docker compose build api && docker compose up -d --force-recreate api</code></pr
       <div class="card-grid">
         <div class="card">
           <h4>Single-host Compose</h4>
-          <p>Fastest path: one VM runs Postgres, MinIO, Redis, and API together. Ideal for pilots, lab deployments, and consortium sandboxes.</p>
+          <p>Fastest path: one VM runs Postgres, RustFS, Redis, and API together. Ideal for pilots, lab deployments, and consortium sandboxes.</p>
         </div>
         <div class="card">
           <h4>Compose + external managed services</h4>
@@ -1400,11 +1408,11 @@ docker compose build api && docker compose up -d --force-recreate api</code></pr
         </div>
         <div class="card">
           <h4>Kubernetes / Nomad</h4>
-          <p>Split stateful sets (Postgres operator, MinIO tenant) from a stateless API Deployment. Use Ingress for TLS and path routing to <code>/api/v1</code>, <code>/ui</code>, <code>/docs</code>.</p>
+          <p>Split stateful sets (Postgres operator, S3-compatible object store) from a stateless API Deployment. Use Ingress for TLS and path routing to <code>/api/v1</code>, <code>/ui</code>, <code>/docs</code>.</p>
         </div>
       </div>
       <p>
-        Regardless of model, preserve the <strong>two-endpoint MinIO pattern</strong>: an internal
+        Regardless of model, preserve the <strong>two-endpoint S3 pattern</strong>: an internal
         endpoint for the API container and a <strong>public</strong> endpoint embedded in presigned
         links returned to browsers. Mixing these is the most common production defect.
       </p>
@@ -1432,7 +1440,7 @@ cp .env.example .env
         <li>
           <div>
             <strong>Start data services and wait for Postgres.</strong>
-            <pre><span class="pre-label">bash</span><code>docker compose up -d postgres minio redis
+            <pre><span class="pre-label">bash</span><code>docker compose up -d postgres rustfs redis
 docker compose ps   # postgres should show “healthy”</code></pre>
           </div>
         </li>
@@ -1483,32 +1491,34 @@ docker compose up -d --force-recreate api</code></pre>
       </p>
 
       <h3 id="deploy-storage">Object storage</h3>
-      <h4>MinIO in Compose (default)</h4>
+      <h4>RustFS in Compose (default)</h4>
       <p>
-        The API talks to MinIO on the internal Docker network (<code>MINIO_ENDPOINT=http://minio:9000</code>).
-        Browsers must never receive that hostname in presigned URLs.
+        The API talks to RustFS on the internal Docker network (<code>S3_ENDPOINT=http://rustfs:9000</code>).
+        Browsers must never receive that hostname in presigned URLs. Sign against
+        <code>S3_PUBLIC_ENDPOINT</code> so the SigV4 host matches what the browser hits.
       </p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Variable</th><th>Compose / dev</th><th>Production example</th></tr></thead>
           <tbody>
-            <tr><td><code>MINIO_ENDPOINT</code></td><td><code>http://minio:9000</code></td><td>Internal service URL (K8s DNS, VPC endpoint)</td></tr>
-            <tr><td><code>MINIO_PUBLIC_ENDPOINT</code></td><td><code>http://localhost:9002</code></td><td><code>https://s3.catalog.example.org</code> or public MinIO ingress</td></tr>
-            <tr><td><code>MINIO_BUCKET</code></td><td><code>fairdatahive-catalog</code></td><td>Institutional bucket name; create before first upload</td></tr>
+            <tr><td><code>S3_ENDPOINT</code></td><td><code>http://rustfs:9000</code></td><td>Internal service URL (K8s DNS, VPC endpoint)</td></tr>
+            <tr><td><code>S3_PUBLIC_ENDPOINT</code></td><td><code>http://localhost:9002</code></td><td><code>https://objects.example.org</code></td></tr>
+            <tr><td><code>S3_BUCKET</code></td><td><code>fairdatahive-catalog</code></td><td>Institutional bucket name; create before first upload</td></tr>
           </tbody>
         </table>
       </div>
       <p>
-        After changing <code>MINIO_PUBLIC_ENDPOINT</code>, recreate the API container. Test by
+        After changing <code>S3_PUBLIC_ENDPOINT</code>, recreate the API container. Test by
         publishing a resource, downloading a file, and confirming the presigned URL host matches
-        what clients can resolve.
+        what clients can resolve. Keep the RustFS console private.
       </p>
-      <h4>External S3 (AWS, Ceph, institutional MinIO cluster)</h4>
+      <h4>External S3 (AWS, Ceph, institutional cluster)</h4>
       <p>
-        FairDataHive uses S3-compatible APIs via <code>aioboto3</code>. Point <code>MINIO_ENDPOINT</code>
-        at the vendor endpoint, set keys and bucket, and set <code>MINIO_PUBLIC_ENDPOINT</code> to the
+        FairDataHive uses S3-compatible APIs via <code>aioboto3</code>. Point <code>S3_ENDPOINT</code>
+        at the vendor endpoint, set keys and bucket, and set <code>S3_PUBLIC_ENDPOINT</code> to the
         same public base users hit (or CloudFront in front of the bucket). Ensure CORS on the bucket
         allows GET from your catalog origin if browsers fetch objects directly.
+        Set <code>PROVISION_STORAGE=false</code> when CreateBucket is denied.
       </p>
 
       <h3 id="deploy-database">Database and migrations</h3>
@@ -1590,11 +1600,14 @@ BASE_URL=https://catalog.example.org
 RUN_MIGRATIONS=true
 
 # Object storage
-MINIO_ENDPOINT=http://minio:9000
-MINIO_PUBLIC_ENDPOINT=https://s3.catalog.example.org
-MINIO_ACCESS_KEY=***
-MINIO_SECRET_KEY=***
-MINIO_BUCKET=fairdatahive-catalog
+S3_ENDPOINT=http://rustfs:9000
+S3_PUBLIC_ENDPOINT=https://objects.example.org
+S3_ACCESS_KEY=***
+S3_SECRET_KEY=***
+S3_BUCKET=fairdatahive-catalog
+S3_REGION=us-east-1
+S3_ADDRESSING_STYLE=path
+PROVISION_STORAGE=true
 MAX_UPLOAD_SIZE_MB=500
 PRESIGNED_URL_EXPIRY_SECONDS=3600
 
@@ -1621,9 +1634,9 @@ DATACITE_API_URL=https://api.datacite.org</code></pre>
       <div class="callout danger">
         <span class="callout-icon">!</span>
         <div class="callout-body">
-          <p><strong>Never deploy with default MinIO credentials</strong> (<code>minioadmin</code>) or
+          <p><strong>Never deploy with default RustFS credentials</strong> (<code>rustfsadmin</code>) or
           <code>DEV_AUTH_ENABLED=true</code> on a network reachable by others. Rotate Postgres and
-          Redis passwords; restrict admin consoles (MinIO console, Keycloak) to management VPNs.</p>
+          Redis passwords; restrict admin consoles (RustFS console, Keycloak) to management VPNs.</p>
         </div>
       </div>
 
@@ -1668,7 +1681,7 @@ DATACITE_API_URL=https://api.datacite.org</code></pre>
             <tr><td>Transport</td><td>TLS 1.2+ everywhere; HSTS on public catalog host</td></tr>
             <tr><td>Object storage</td><td>Unique keys; bucket policy least privilege; correct public endpoint</td></tr>
             <tr><td>Database</td><td>Strong password; no public port; encrypted volume at rest if required by policy</td></tr>
-            <tr><td>Network</td><td>Redis and Postgres internal-only; restrict <code>/metrics</code> and MinIO console</td></tr>
+            <tr><td>Network</td><td>Redis and Postgres internal-only; restrict <code>/metrics</code> and the RustFS console</td></tr>
             <tr><td>Uploads</td><td>Enforce <code>MAX_UPLOAD_SIZE_MB</code>; scan at proxy or storage layer if policy requires AV</td></tr>
             <tr><td>Private resources</td><td>Review access-request workflow; enable SMTP for auditability of grants</td></tr>
             <tr><td>Dependencies</td><td>Rebuild images on security patches; pin base image digests in regulated environments</td></tr>
@@ -1806,7 +1819,7 @@ npm run dev        # single Vite on http://127.0.0.1:5173 only</code></pre>
             <code>dcat:Distribution</code>; you may use one or several.
             <ul>
               <li>
-                <em>File upload</em> — data stored in FairDataHive (MinIO). Files upload as you
+                <em>File upload</em> — data stored in FairDataHive (S3/RustFS). Files upload as you
                 select them; ZIP archives are unpacked and each member can be linked. Download on the
                 resource page uses a presigned URL.
               </li>
@@ -1933,7 +1946,7 @@ npm run dev        # single Vite on http://127.0.0.1:5173 only</code></pre>
       <h2>API — Files</h2>
       <p>
         Files are uploaded independently before (or during) resource creation. The returned
-        <code>upload_token</code> is the MinIO object key and must be included in a
+        <code>upload_token</code> is the S3 object key and must be included in a
         <code>DistributionCreate</code> payload when creating or patching a resource.
       </p>
 
@@ -2046,7 +2059,7 @@ curl "http://localhost:8002/api/v1/oai?verb=ListRecords&metadataPrefix=oai_dc&fr
         </div>
         <div class="card">
           <h4>Distribution</h4>
-          <p>A single access point — <code>upload</code> (MinIO), <code>external</code> link
+          <p>A single access point — <code>upload</code> (S3), <code>external</code> link
             (<code>access_url</code>), or <code>api</code> service (<code>access_url</code> plus
             <code>dcat:DataService</code>). See <a href="#ui-guide">Creating a resource</a> for when
             to use each.</p>
@@ -2276,7 +2289,7 @@ DELETE /resources  →  tombstone  (data_deleted=true, metadata retained)</code>
       <h2>Local Development (without Docker)</h2>
       <p>
         You need a running PostgreSQL 16 instance with the <code>pgvector</code> extension
-        enabled, plus Redis and MinIO (or a local MinIO binary).
+        enabled, plus Redis and RustFS (or any S3-compatible endpoint).
       </p>
 
       <pre><span class="pre-label">bash</span><code># Create and activate a virtual environment
@@ -2306,7 +2319,7 @@ cd frontend && cp .env.example .env && npm install && npm run dev</code></pre>
       <h2>Testing</h2>
       <p>
         The test suite uses <code>pytest-asyncio</code> with an in-memory SQLite database.
-        No PostgreSQL, Redis, or MinIO instance is required to run the tests.
+        No PostgreSQL, Redis, or object-storage instance is required to run the tests.
       </p>
 
       <pre><span class="pre-label">bash</span><code># Run all tests
@@ -2349,14 +2362,14 @@ TESTING=1 pytest tests/ -m "not integration" -q</code></pre>
               <td>Confirm <code>.env</code> exists and set the variable; rebuild: <code>docker compose build api &amp;&amp; docker compose up -d --force-recreate api</code></td>
             </tr>
             <tr>
-              <td>Download link opens <code>http://minio:9000/…</code> in browser</td>
+              <td>Download link opens <code>http://rustfs:9000/…</code> in browser</td>
               <td>Presigned URL uses Docker hostname</td>
-              <td>Set <code>MINIO_PUBLIC_ENDPOINT=http://localhost:9002</code> in <code>.env</code> and recreate the API container</td>
+              <td>Set <code>S3_PUBLIC_ENDPOINT=http://localhost:9002</code> in <code>.env</code> and recreate the API container</td>
             </tr>
             <tr>
               <td>Port <code>9000</code> already in use</td>
-              <td>Another MinIO on the host (e.g. old stack)</td>
-              <td>Compose maps MinIO to <strong>9002</strong> (S3) and <strong>9003</strong> (console). Use <code>MINIO_PUBLIC_ENDPOINT=http://localhost:9002</code>.</td>
+              <td>Another S3 service on the host (e.g. old MinIO stack)</td>
+              <td>Compose maps RustFS to loopback <strong>9002</strong> (S3) and <strong>9003</strong> (console). Use <code>S3_PUBLIC_ENDPOINT=http://localhost:9002</code>.</td>
             </tr>
             <tr>
               <td><code>Search returns 500</code> with a query string</td>
@@ -2446,7 +2459,7 @@ docker compose build api && docker compose up -d --force-recreate api</code></pr
     <hr>
 
     <p style="text-align:center;color:var(--muted);font-size:0.8rem;padding:1rem 0 0;">
-      FairDataHive v1.0.0 &nbsp;·&nbsp; Built on FastAPI, PostgreSQL, pgvector, MinIO, Redis &nbsp;·&nbsp;
+      FairDataHive v1.0.0 &nbsp;·&nbsp; Built on FastAPI, PostgreSQL, pgvector, RustFS, Redis &nbsp;·&nbsp;
       <a href="#quickstart">Get started</a>
     </p>
 

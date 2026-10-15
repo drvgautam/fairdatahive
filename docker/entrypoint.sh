@@ -29,4 +29,15 @@ if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
   alembic upgrade head
 fi
 
+# Explicit, idempotent bucket provisioning. The API never creates buckets at
+# request time. Set PROVISION_STORAGE=false when the bucket is managed externally
+# (e.g. AWS S3 with IAM that denies CreateBucket); the API still needs access.
+if [ "${PROVISION_STORAGE:-true}" = "true" ]; then
+  echo "Provisioning object storage bucket..."
+  python3 -m app.tools.provision_storage --wait "${STORAGE_WAIT_SECONDS:-60}"
+else
+  echo "Checking object storage access..."
+  python3 -m app.tools.provision_storage --check --wait "${STORAGE_WAIT_SECONDS:-60}"
+fi
+
 exec "$@"

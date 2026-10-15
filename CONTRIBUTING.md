@@ -1,6 +1,6 @@
 # Contributing to FairDataHive
 
-Thank you for your interest in contributing. This project is a FAIR-compliant research data catalog (FastAPI, PostgreSQL/pgvector, MinIO, React).
+Thank you for your interest in contributing. This project is a FAIR-compliant research data catalog (FastAPI, PostgreSQL/pgvector, RustFS, React).
 
 ## Repository
 

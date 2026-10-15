@@ -66,7 +66,7 @@ class DatasetRead(BaseModel):
 
 
 class UploadResponse(BaseModel):
-    upload_token: str = Field(description="MinIO object key (use as upload_token).")
+    upload_token: str = Field(description="Object storage key (use as upload_token).")
     object_key: str
     checksum_sha256: str
     byte_size: int
