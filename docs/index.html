@@ -1770,7 +1770,7 @@ npm run dev        # single Vite on http://127.0.0.1:5173 only</code></pre>
       <ul>
         <li><strong>Auto</strong> (default) — keyword search first; if fewer than 3 hits, semantic results are merged in.</li>
         <li><strong>Keyword</strong> — best for titles, themes, and keyword tags (including short tags like <code>a</code> or comma-separated <code>a,b,c,d</code>). Uses PostgreSQL full-text search plus a token fallback when FTS misses (e.g. single-letter English stop words).</li>
-        <li><strong>Semantic</strong> — best for natural-language questions (e.g. “impedance data for aluminium alloys”). Matches by meaning via embeddings stored at publish time; requires PostgreSQL + pgvector.</li>
+        <li><strong>Semantic</strong> — best for natural-language questions (e.g. “air pollution readings from city sensors”). Matches by meaning via embeddings stored at publish time; requires PostgreSQL + pgvector.</li>
       </ul>
       <p>Facet filters for <em>theme</em>, <em>license</em>, and <em>format</em> appear once a query is submitted.</p>
 
@@ -1897,13 +1897,13 @@ npm run dev        # single Vite on http://127.0.0.1:5173 only</code></pre>
       <h3>Create resource — request body</h3>
       <pre><span class="pre-label">json</span><code>{
   "scope": "public",               // "public" or a project ID string
-  "title": "Corrosion impedance study",
-  "description": "EIS measurements on AA2024 alloy coated with…",
-  "keywords": ["electrochemistry", "EIS", "AA2024"],
-  "theme": "Electrochemistry",
+  "title": "Urban air quality measurements",
+  "description": "Hourly PM2.5 and NO2 readings from city sensor stations…",
+  "keywords": ["air quality", "PM2.5", "sensors"],
+  "theme": "EarthScience",
   "license_id": "CC-BY-4.0",
   "language": "en",
-  "provenance": "Collected at VIPCOAT lab, Vienna 2024…",
+  "provenance": "Collected by a municipal sensor network, 2024…",
   "is_private": false,
   "datasets": [
     {

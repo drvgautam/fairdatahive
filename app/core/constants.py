@@ -56,7 +56,6 @@ LICENSE_VOCAB: dict[str, dict[str, str]] = {
 
 
 THEME_LIST: list[dict[str, str]] = [
-    {"id": "Electrochemistry", "label": "Electrochemistry"},
     {"id": "MaterialsScience", "label": "Materials Science"},
     {"id": "Chemistry", "label": "Chemistry"},
     {"id": "Physics", "label": "Physics"},

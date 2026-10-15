@@ -20,7 +20,7 @@ async def _publish_with_title(client, title: str, description: str | None = None
 
 
 async def test_empty_search_returns_all_published(client):
-    await _publish_with_title(client, "Corrosion impedance study")
+    await _publish_with_title(client, "Urban air quality study")
     resp = await client.get("/api/v1/search")
     assert resp.status_code == 200
     data = resp.json()
@@ -29,14 +29,14 @@ async def test_empty_search_returns_all_published(client):
 
 
 async def test_keyword_search_filters_by_query(client):
-    await _publish_with_title(client, "Corrosion impedance study")
+    await _publish_with_title(client, "Urban air quality study")
     await _publish_with_title(client, "Unrelated dataset of cats")
 
-    resp = await client.get("/api/v1/search?q=corrosion")
+    resp = await client.get("/api/v1/search?q=urban")
     assert resp.status_code == 200
     data = resp.json()
     titles = [hit["resource"]["title"] for hit in data["results"]]
-    assert any("Corrosion" in t for t in titles)
+    assert any("Urban" in t for t in titles)
     assert not any("cats" in t for t in titles)
 
 
@@ -74,22 +74,22 @@ async def test_keyword_search_matches_short_keywords(client):
 
 
 async def test_keyword_search_matches_stored_keyword_terms(client):
-    await _publish_with_keywords(client, ["electrochemistry", "impedance"])
-    resp = await client.get("/api/v1/search?q=impedance&mode=keyword")
+    await _publish_with_keywords(client, ["air quality", "particulates"])
+    resp = await client.get("/api/v1/search?q=particulates&mode=keyword")
     assert resp.status_code == 200
     assert resp.json()["total"] >= 1
 
 
 async def test_search_suggest(client):
-    await _publish_with_title(client, "Corrosion impedance study")
-    resp = await client.get("/api/v1/search/suggest?q=corr")
+    await _publish_with_title(client, "Urban air quality study")
+    resp = await client.get("/api/v1/search/suggest?q=urb")
     assert resp.status_code == 200
     suggestions = resp.json()["suggestions"]
-    assert any("Corrosion" in s for s in suggestions)
+    assert any("Urban" in s for s in suggestions)
 
 
 async def test_catalog_stats(client):
-    await _publish_with_title(client, "Corrosion impedance study")
+    await _publish_with_title(client, "Urban air quality study")
     resp = await client.get("/api/v1/catalog/stats")
     assert resp.status_code == 200
     data = resp.json()
@@ -109,4 +109,4 @@ async def test_themes_endpoint(client):
     resp = await client.get("/api/v1/themes")
     assert resp.status_code == 200
     labels = [item["label"] for item in resp.json()]
-    assert any("Electro" in s for s in labels)
+    assert "Earth Science" in labels
