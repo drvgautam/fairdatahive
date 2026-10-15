@@ -10,7 +10,7 @@
 
 **FAIR-aligned research data catalog** — DCAT 3 metadata, REST API, and React UI.
 
-FastAPI · PostgreSQL + pgvector · MinIO · Redis · React (Vite)
+FastAPI · PostgreSQL + pgvector · RustFS (S3) · Redis · React (Vite)
 
 [Documentation](https://drvgautam.github.io/fairdatahive/) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
 
@@ -50,7 +50,7 @@ docker compose up -d
 | Swagger | http://localhost:8002/swagger |
 | Built UI (from API image) | http://localhost:8002/ui |
 
-`docker compose up -d` starts Postgres, MinIO, Redis, and the API only. Migrations run when the API container starts.
+`docker compose up -d` starts Postgres, RustFS, Redis, and the API only. Migrations run when the API container starts.
 
 ### Web UI (development)
 
@@ -75,6 +75,7 @@ Run from the repository root:
 | `make dev-api` | API with hot reload (bind-mounted `app/`) |
 | `make dev-ui` | Vite dev server on :5173 |
 | `make test` | Unit tests (SQLite) |
+| `make test-storage` | S3 compatibility tests against pinned RustFS |
 | `make check` | Tests + frontend build (before push) |
 | `make build-api` | Build UI and refresh API image |
 
@@ -86,7 +87,7 @@ Run from the repository root:
 make dev-api
 ```
 
-**Without Docker** (you provide Postgres 16 + pgvector, Redis, MinIO):
+**Without Docker** (you provide Postgres 16 + pgvector, Redis, and an S3 endpoint):
 
 ```bash
 python3.12 -m venv .venv && source .venv/bin/activate
@@ -108,7 +109,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for branch workflow, PRs, and CI.
 
 ## Deploy
 
-For production: change all default passwords, set `DEV_AUTH_ENABLED=false`, configure Keycloak (`docker compose --profile auth up -d auth`), set `CORS_ORIGINS` and `MINIO_PUBLIC_ENDPOINT`, and restrict admin endpoints.
+For production: change all default passwords, set `DEV_AUTH_ENABLED=false`, configure Keycloak (`docker compose --profile auth up -d auth`), set `CORS_ORIGINS` and `S3_PUBLIC_ENDPOINT`, and restrict admin endpoints. MinIO→RustFS cutover: [docs/storage-migration.md](docs/storage-migration.md).
 
 - Checklist: [SECURITY.md](SECURITY.md)
 - Architecture, env vars, backups: **[Project documentation](https://drvgautam.github.io/fairdatahive/)** (GitHub Pages) or http://localhost:8002/docs when running locally
@@ -122,9 +123,9 @@ Host ports differ from defaults to reduce clashes:
 | 8002 | API |
 | 5173 | Vite UI (dev) |
 | 5434 | PostgreSQL |
-| 9002 / 9003 | MinIO API / console |
+| 9002 / 9003 | RustFS S3 API / console (loopback) |
 
-If downloads open `http://minio:9000/...` in the browser, set `MINIO_PUBLIC_ENDPOINT=http://localhost:9002` in `.env` and recreate the `api` container.
+If downloads open `http://rustfs:9000/...` in the browser, set `S3_PUBLIC_ENDPOINT=http://localhost:9002` in `.env` and recreate the `api` container. Legacy `MINIO_*` names still work for one release.
 
 More troubleshooting: [CONTRIBUTING.md](CONTRIBUTING.md) and API docs.
 

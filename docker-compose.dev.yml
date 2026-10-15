@@ -17,6 +17,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rustfs:
+        condition: service_healthy
     restart: "no"
 
   api:
@@ -43,8 +45,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      minio:
-        condition: service_started
+      rustfs:
+        condition: service_healthy
       redis:
         condition: service_started
       migrate:

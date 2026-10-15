@@ -36,7 +36,7 @@ body:
         - API / backend
         - Web UI
         - Search
-        - Upload / MinIO
+        - Upload / object storage
         - Auth / access control
         - Docker / deployment
         - Documentation

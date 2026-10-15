@@ -25,13 +25,14 @@ FairDataHive ships with **development defaults** that must be changed before any
 |---------|-------------|------------|
 | `DEV_AUTH_ENABLED` | `false` in `.env.example` | **`false`** — use Keycloak JWT validation |
 | `KEYCLOAK_CLIENT_ID` | Unset (aud not checked) | Set to your API OAuth client; JWT `aud` is verified |
-| Postgres / MinIO / Redis passwords | Default compose values | Strong unique secrets |
-| `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` | `minioadmin` | Rotated credentials |
+| Postgres / RustFS / Redis passwords | Default compose values | Strong unique secrets |
+| `S3_ACCESS_KEY` / `S3_SECRET_KEY` | `rustfsadmin` (local) | Restricted bucket-scoped key, not the RustFS root |
+| `RUSTFS_ROOT_ACCESS_KEY` / `RUSTFS_ROOT_SECRET_KEY` | `rustfsadmin` | Root keys used only to bootstrap the store |
 | `CORS_ORIGINS` | Local dev URLs | Explicit production UI origins only |
 | Keycloak admin | Default in compose profile | Secured realm, no public admin console |
 | `ENABLE_OPENAPI` / `ENABLE_METRICS` | `true` for local dev | Set **`false`** on public APIs unless behind VPN |
 | `/metrics` | Exposed on API when `ENABLE_METRICS=true` | Disable or restrict to monitoring network |
-| MinIO console (port 9003) | Local access | VPN or disabled publicly |
+| RustFS console (port 9003) | Loopback only | VPN or disabled publicly; never expose root keys to browsers |
 
 Never commit `.env` files or real API keys to the repository.
 

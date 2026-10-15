@@ -17,18 +17,37 @@ services:
       retries: 10
       start_period: 10s
 
-  minio:
-    image: quay.io/minio/minio:RELEASE.2024-04-18T19-09-19Z
-    command: server --console-address ":9001" /data
-    ports:
-      # Host 9002/9003 avoids conflict with another MinIO on 9000/9001
-      - "9002:9000"
-      - "9003:9001"
+  rustfs:
+    # Object storage (S3 API). Pinned to an immutable digest; bump deliberately and
+    # re-run `pytest tests/test_storage_integration.py` against the new build.
+    # Override with RUSTFS_IMAGE=... in .env if you must test another release.
+    image: ${RUSTFS_IMAGE:-rustfs/rustfs:1.0.1@sha256:1803faef57627e2d9c2e7d89d655d712ddded5389040054987163043fecb6a3c}
+    command: ["/data"]
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      # Server ROOT credentials. Local default only; the API should use a
+      # restricted key in production (see SECURITY.md).
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ROOT_ACCESS_KEY:-rustfsadmin}
+      RUSTFS_SECRET_KEY: ${RUSTFS_ROOT_SECRET_KEY:-rustfsadmin}
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_OBS_LOGGER_LEVEL: ${RUSTFS_LOG_LEVEL:-error}
+    ports:
+      # Host 9002/9003 (same as the previous MinIO mapping) so S3_PUBLIC_ENDPOINT
+      # keeps working. Bound to loopback: the console must not be internet-facing.
+      - "127.0.0.1:9002:9000"
+      - "127.0.0.1:9003:9001"
     volumes:
-      - minio-data:/data
+      # New volume on purpose: never point RustFS at the old minio-data volume.
+      - rustfs-data:/data
+    healthcheck:
+      # curl is present in the pinned image; /health is the documented S3 probe.
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:9000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
@@ -64,8 +83,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      minio:
-        condition: service_started
+      rustfs:
+        condition: service_healthy
       redis:
         condition: service_started
     entrypoint: ["/app/docker/entrypoint.sh"]
@@ -83,5 +102,8 @@ services:
 
 volumes:
   postgres-data:
+  rustfs-data:
+  # Retained (not mounted) so existing MinIO data survives for migration/rollback.
+  # Remove only after the rollback window in docs/storage-migration.md has passed.
   minio-data:
   redis-data:
