@@ -216,7 +216,6 @@ export function CreatePage() {
             <input
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-              placeholder="electrochemistry, coating, corrosion"
             />
           </label>
           <div className="row-2">
