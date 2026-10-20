@@ -5,7 +5,7 @@ sqlalchemy==2.0.30
 asyncpg==0.29.0
 alembic==1.13.1
 pydantic==2.10.6
-pydantic-settings==2.7.1
+pydantic-settings==2.16.0
 PyJWT[crypto]==2.15.1
 httpx==0.28.1
 aioboto3==12.4.0
